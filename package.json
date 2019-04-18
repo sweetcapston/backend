@@ -21,7 +21,8 @@
     "mongoose": "^5.4.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
-    "save": "^2.3.3"
+    "save": "^2.3.3",
+    "session-file-store": "^1.2.0"
   },
   "devDependencies": {
     "nodemon": "^1.18.9"
