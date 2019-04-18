@@ -1,11 +1,11 @@
 language: node.js
 node_js:
-        - "10"
+  - "10"
 before_script:
-        - npm install
-        
-script: 
-        - npm start
+  - npm install
+
+script:
+  - npm start
 
 cache: npm
 
