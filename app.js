@@ -5,17 +5,15 @@ const passport = require('passport');
 const flash = require('connect-flash');
 const session = require('express-session');
 const bodyParser = require('body-parser');
-const FileStore = require( 'session-file-store' )(session)
 const app = express();
 
 // Passport Config
 require('./config/passport')(passport);
-
 // Connect to MongoDB
 mongoose.Promise = global.Promise;
 
 // CONNECT TO MONGODB SERVER
-mongoose.connect('mongodb://106.10.46.246:27017/openclass', {
+mongoose.connect('mongodb://106.10.46.89:27017/openclass', {
   user: "openclass",
   pass: "qwe123",
   authSource: "admin",
@@ -38,8 +36,7 @@ app.use(session({
   saveUninitialized: true,      //세션 아이디를 실제 사용하기전에는 발급하지 않음
   cookie:{
     maxAge: 1000 * 60 * 60 * 24   //24시간 만기
-  },
-  store:new FileStore()
+  }
 }));
 
 // Passport middleware
@@ -59,7 +56,8 @@ app.use(function(req, res, next) {
 
 //HTTP 접근 제어(cor) 처리
 const allowCrossDomain = function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Origin', "http://localhost:8080");
+    res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
@@ -75,3 +73,5 @@ app.use('/users', require('./routes/users.js'));
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, console.log(`Server started on port ${PORT}`));
+
+module.exports = app;

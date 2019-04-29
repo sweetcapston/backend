@@ -1,10 +1,11 @@
 {
-  "name": "node_passport_login",
+  "name": "backend",
   "version": "2.0.0",
   "description": "Node.js authentication with Passport",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
+    "test": "mocha",
     "dev": "nodemon app.js"
   },
   "keywords": [],
@@ -12,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "chai-http": "^4.3.0",
     "connect-flash": "^0.1.1",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
@@ -25,6 +27,7 @@
     "session-file-store": "^1.2.0"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "nodemon": "^1.18.9"
   }
 }

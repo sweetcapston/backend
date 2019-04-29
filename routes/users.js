@@ -7,7 +7,9 @@ const passportConfig= require('../config/passport');
 // Load User model
 const User = mongoose.model('User');
 // Login Page
-router.get('/login', (req, res) => res.render('login'));
+router.get('/login', (req, res) => {
+  res.send(true)
+});
 
 // Duplicate User
 router.get('/duplicate/:email', (req, res) => {
@@ -17,7 +19,7 @@ router.get('/duplicate/:email', (req, res) => {
       console.log('이미 등록된 아이디 입니다.');
       res.send(true)
     }
-    res.send(false)
+    else res.send(false)
   });
 })
 
@@ -57,20 +59,31 @@ passportConfig();
 router.post('/login',
     passport.authenticate('local'),
     function(req, res) {
-      res.send(req.session.passport.user);
+      var Identity;
+      if(req.user.StudentId == "9999")
+        Identity = 2;
+      else 
+        Identity = 1;
+
+      res.send({
+        Identity: Identity        
+      });
 });
 
 // Logout
 router.get('/logout', (req, res) => {
-  delete req.session.token;
   req.logout();
   req.flash('success_msg', 'You are logged out');
-  res.redirect('/users/login');
+  res.send("logout");
 });
 
 //autologin
 router.get('/', (req,res)=>{
-  console.log(req.headers.authorization)
+  var sessionCheck = false;
+  if (typeof req !== 'undefined' && typeof req.user !== 'undefined') {
+    sessionCheck = true
+  }
+  res.send(sessionCheck);
 });
 
 module.exports = router;
