@@ -19,6 +19,7 @@
     "express": "^4.16.4",
     "express-ejs-layouts": "^2.5.0",
     "express-session": "^1.15.6",
+    "mocha": "^6.1.4",
     "mongodb": "^3.2.2",
     "mongoose": "^5.4.1",
     "passport": "^0.4.0",

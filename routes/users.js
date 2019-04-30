@@ -23,9 +23,6 @@ router.get('/duplicate/:email', (req, res) => {
   });
 })
 
-// Register Page
-router.get('/signup', (req, res) => res.render('signup'));
-
 // Register
 router.post('/signup', (req, res) => {
   const { name, email,StudentId, password } = req.body;
@@ -81,6 +78,7 @@ router.get('/logout', (req, res) => {
 router.get('/', (req,res)=>{
   var sessionCheck = false;
   if (typeof req !== 'undefined' && typeof req.user !== 'undefined') {
+    console.log(true)
     sessionCheck = true
   }
   res.send(sessionCheck);
