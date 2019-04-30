@@ -52,6 +52,7 @@ router.post('/signup', (req, res) => {
     console.log("new user signed up!");
 });
 passportConfig();
+
 // Login
 router.post('/login',
     passport.authenticate('local'),
@@ -83,5 +84,4 @@ router.get('/', (req,res)=>{
   }
   res.send(sessionCheck);
 });
-
 module.exports = router;
