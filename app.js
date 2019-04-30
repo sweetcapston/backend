@@ -5,7 +5,7 @@ const passport = require('passport');
 const flash = require('connect-flash');
 const session = require('express-session');
 const bodyParser = require('body-parser');
-const FileStore = require( 'session-file-store' )(session)
+const FileStore = require( 'session-file-store' )(session);
 const app = express();
 
 // Passport Config
@@ -15,7 +15,7 @@ require('./config/passport')(passport);
 mongoose.Promise = global.Promise;
 
 // CONNECT TO MONGODB SERVER
-mongoose.connect('mongodb://106.10.46.246:27017/openclass', {
+mongoose.connect('mongodb://106.10.46.89:27017/openclass', {
   user: "openclass",
   pass: "qwe123",
   authSource: "admin",
@@ -39,7 +39,7 @@ app.use(session({
   cookie:{
     maxAge: 1000 * 60 * 60 * 24   //24시간 만기
   },
-  store:new FileStore()
+  //store:new FileStore()
 }));
 
 // Passport middleware
@@ -48,6 +48,7 @@ app.use(passport.session());
 
 // Connect flash
 app.use(flash());
+
 // Global variables
 app.use(function(req, res, next) {
   res.locals.success_msg = req.flash('success_msg');

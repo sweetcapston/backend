@@ -53,11 +53,13 @@ router.post('/signup', (req, res) => {
     console.log("new user signed up!");
 });
 passportConfig();
+
 // Login
 router.post('/login',
     passport.authenticate('local'),
     function(req, res) {
       res.send(req.session.passport.user);
+      console.log(req.user.email);
 });
 
 // Logout
@@ -70,7 +72,25 @@ router.get('/logout', (req, res) => {
 
 //autologin
 router.get('/', (req,res)=>{
-  console.log(req.headers.authorization)
-});
+  // let classcode = "";
+  // for(let i=0;i<6;i++)
+  // {
+  //   let ran=Math.floor(Math.random() * 36);
+  //   if(ran<10) {
+  //     ran = ran+48;
+  //   }
+  //   else {
+  //     ran = ran+87;
+  //   }
+  //   console.log(ran);
+  //   classcode=classcode+String.fromCharCode(ran);
+  // }
+  // console.log(classcode);
 
+  console.log('세션이메일 : '+req.user);
+  //console.log(req.headers.authorization);
+  if(req.headers.authorization==null){
+    console.log('로그인 중');
+  }
+});
 module.exports = router;
