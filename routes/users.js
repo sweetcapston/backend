@@ -5,7 +5,7 @@ const passport = require('passport');
 const mongoose = require('mongoose');
 const passportConfig= require('../config/passport');
 // Load User model
-const User = mongoose.model('User');
+const User = mongoose.model('user');
 // Login Page
 router.get('/login', (req, res) => {
   res.send(true)
