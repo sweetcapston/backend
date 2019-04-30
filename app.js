@@ -20,6 +20,7 @@ mongoose.connect('mongodb://106.10.46.89:27017/openclass', {
   useNewUrlParser:true
 } ).then(() => console.log('Successfully connected to mongodb'))
   .catch(e => console.error(e));
+mongoose.set('useCreateIndex', true);
 
 // EJS
 app.use(expressLayouts);
@@ -70,6 +71,7 @@ app.use(allowCrossDomain);
 // Routes
 app.use('/', require('./routes/index.js'));
 app.use('/users', require('./routes/users.js'));
+app.use('/prof', require('./routes/professor.js'));
 
 const PORT = process.env.PORT || 5000;
 
