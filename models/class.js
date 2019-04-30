@@ -9,6 +9,5 @@ const ClassSchema = new mongoose.Schema({
   alarm: { type:Boolean, default: true },
 });
 
-const Class = mongoose.model('Class', ClassSchema);
+module.exports = mongoose.model('Class', ClassSchema);
 
-module.exports = Class;

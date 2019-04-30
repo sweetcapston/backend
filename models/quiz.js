@@ -8,7 +8,6 @@ const QuizSchema = new mongoose.Schema({
   Date: { type: Date, default: Date.now },
 });
 
-const AutoIncrement = require('mongoose-sequence')(mongoose);
 QuizSchema.plugin(AutoIncrement, {id: 'QZID_seq',inc_field: 'QZID'});
 const Quiz = mongoose.model('Quiz', QuizSchema);
 

@@ -3,11 +3,8 @@ const passport = require('passport');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-// Load User model
-const User = require('../models/User');
-const Class = require('../models/Class');
-
-
+// Load model
+const { User, Class } = require('../models');
 module.exports = ()=> {
   passport.use(
     new LocalStrategy({ usernameField: 'email',session: true }, (email, password, done) => {
