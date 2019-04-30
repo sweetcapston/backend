@@ -5,7 +5,7 @@ const passport = require('passport');
 const mongoose = require('mongoose');
 const passportConfig= require('../config/passport');
 // Load User model
-const User = mongoose.model('User');
+const User = mongoose.model('user');
 // Login Page
 router.get('/login', (req, res) => {
   res.send(true)
@@ -22,9 +22,6 @@ router.get('/duplicate/:email', (req, res) => {
     else res.send(false)
   });
 })
-
-// Register Page
-router.get('/signup', (req, res) => res.render('signup'));
 
 // Register
 router.post('/signup', (req, res) => {
@@ -82,6 +79,7 @@ router.get('/logout', (req, res) => {
 router.get('/', (req,res)=>{
   var sessionCheck = false;
   if (typeof req !== 'undefined' && typeof req.user !== 'undefined') {
+    console.log(true)
     sessionCheck = true
   }
   res.send(sessionCheck);
