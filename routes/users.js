@@ -7,7 +7,9 @@ const passportConfig= require('../config/passport');
 // Load User model
 const User = mongoose.model('User');
 // Login Page
-router.get('/login', (req, res) => res.render('login'));
+router.get('/login', (req, res) => {
+  res.send(true)
+});
 
 // Duplicate User
 router.get('/duplicate/:email', (req, res) => {
@@ -17,7 +19,7 @@ router.get('/duplicate/:email', (req, res) => {
       console.log('이미 등록된 아이디 입니다.');
       res.send(true)
     }
-    res.send(false)
+    else res.send(false)
   });
 })
 
@@ -58,39 +60,30 @@ passportConfig();
 router.post('/login',
     passport.authenticate('local'),
     function(req, res) {
-      res.send(req.session.passport.user);
-      console.log(req.user.email);
+      var Identity;
+      if(req.user.StudentId == "9999")
+        Identity = 2;
+      else 
+        Identity = 1;
+
+      res.send({
+        Identity: Identity        
+      });
 });
 
 // Logout
 router.get('/logout', (req, res) => {
-  delete req.session.token;
   req.logout();
   req.flash('success_msg', 'You are logged out');
-  res.redirect('/users/login');
+  res.send("logout");
 });
 
 //autologin
 router.get('/', (req,res)=>{
-  // let classcode = "";
-  // for(let i=0;i<6;i++)
-  // {
-  //   let ran=Math.floor(Math.random() * 36);
-  //   if(ran<10) {
-  //     ran = ran+48;
-  //   }
-  //   else {
-  //     ran = ran+87;
-  //   }
-  //   console.log(ran);
-  //   classcode=classcode+String.fromCharCode(ran);
-  // }
-  // console.log(classcode);
-
-  console.log('세션이메일 : '+req.user);
-  //console.log(req.headers.authorization);
-  if(req.headers.authorization==null){
-    console.log('로그인 중');
+  var sessionCheck = false;
+  if (typeof req !== 'undefined' && typeof req.user !== 'undefined') {
+    sessionCheck = true
   }
+  res.send(sessionCheck);
 });
 module.exports = router;
