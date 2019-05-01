@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const Answer_Schema = new mongoose.Schema({
-  classcode: { type: String, required: true }, 
+  classCode: { type: String, required: true }, 
   userID: { type: String, required: true },
   SID: { type: Number, required: true },
   content: { type: String, required: true }

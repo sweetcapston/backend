@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const Answer_QSchema = new mongoose.Schema({
-  classcode: { type: String, required: true }, 
+  classCode: { type: String, required: true }, 
   userID: { type: String, required: true },
   QZID: { type: Number, required: true },
   PID: { type: Number, required: true },

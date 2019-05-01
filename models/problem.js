@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const ProblemSchema = new mongoose.Schema({
-  classcode: {type: String, required:true },
+  classCode: {type: String, required:true },
   QZID: { type: Number, required:true },
   PID: { type: Number },
   content: { type: String, required:true },

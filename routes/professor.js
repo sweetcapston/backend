@@ -6,10 +6,20 @@ const mongoose = require('mongoose');
 const Class = mongoose.model('Class');
 const User = mongoose.model('user');
 
+router.post('/', (req,res)=>{
+    var sessionCheck = false;
+    if (typeof req !== 'undefined' && typeof req.user !== 'undefined') {
+        console.log(true)
+        sessionCheck = true
+    }
+    res.send(sessionCheck);
+    //user의 클래스 목록들을 받아와서 프론트로전달
 
-router.post('/classcreate', (req, res) => {
-    const {classname} = req.body;
-    let classcode = "";
+});
+
+router.post('/classCreate', (req, res) => {
+    const {className} = req.body;
+    let classCode = "";
     //6자리 난수 코드 생성
     for(let i = 0; i<6; i++)
     {
@@ -20,27 +30,60 @@ router.post('/classcreate', (req, res) => {
         else {
             ran = ran + 87;
         }
-        classcode = classcode + String.fromCharCode(ran);
+
+        classCode=classCode+String.fromCharCode(ran);
     }
     const newClass = new Class({
-        classcode: classcode,
-        classname: classname,
+        classCode: classCode,
+        className: className,
         profID: req.user.email,
-        profname: req.user.name,
+        profName: req.user.name,
     });
-    newClass.save().then(newClass => {
-        User.findByIdAndUpdate(
-            req.user._id,
-            {$push: { "classList": {
-                classcode:classcode,
-                classname:classname,
-                profname:req.user.name
-            }}}
-        )
+    newClass.save()
+        .then(newClass => {
+            User.findByIdAndUpdate(
+                req.user._id,
+                {$push: { "classList": {
+                            classCode:classCode,
+                            className:className,
+                            profName:req.user.name
+                        }}}
+            )
         .then(result => {
-            res.send(classcode);
+            res.send(classCode);
         })
+            console.log(req.user.name+'님이'+className+' 클래스를 생성하였습니다.'+' 클래스코드 : '+classCode);
     })
     .catch(err => console.log(err));
+
+
 });
+
+
+router.get('/:classCode/delete', (req, res) => {
+    const {classCode} = req.params
+    console.log(classCode)
+    User.findbyIdAndUpdate(
+        req.user._id,
+        {$pull: { "classList": {
+                    classCode:classCode}}}
+    )
+    .then(result => {
+        Class.findOne({classCode: classCode}).
+        then(thisclass => {
+            if (thisclass){
+                thisclass.remove();
+
+                console.log(req.user.name+'님이'+className+' 클래스를 삭제하였습니다.'+' 클래스코드 : '+classCode);
+                res.send(true);
+            }
+            else{
+                res.send(false);
+            }
+        })
+
+    })
+
+});
+
 module.exports = router;

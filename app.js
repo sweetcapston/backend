@@ -72,7 +72,7 @@ app.use(allowCrossDomain);
 app.use('/', require('./routes/index.js'));
 app.use('/users', require('./routes/users.js'));
 app.use('/prof', require('./routes/professor.js'));
-
+app.use('/stud', require('./routes/student.js'));
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, console.log(`Server started on port ${PORT}`));

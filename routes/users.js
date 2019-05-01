@@ -25,10 +25,10 @@ router.get('/duplicate/:email', (req, res) => {
 
 // Register
 router.post('/signup', (req, res) => {
-  const { name, email,StudentId, password } = req.body;
+  const { name, email,studentId, password } = req.body;
     const newUser = new User({
       name: name,
-      StudentId: StudentId,
+      studentId: studentId,
       email: email,
       password: password
     });
@@ -57,15 +57,17 @@ passportConfig();
 router.post('/login',
     passport.authenticate('local'),
     function(req, res) {
-      var Identity;
-      if(req.user.StudentId == "9999")
+      let Identity;
+      if(req.user.studentId == "9999")
         Identity = 2;
       else 
         Identity = 1;
 
       res.send({
-        Identity: Identity        
+        Identity: Identity,
+        classList: req.user.classList
       });
+
 });
 
 // Logout
@@ -77,7 +79,7 @@ router.get('/logout', (req, res) => {
 
 //autologin
 router.get('/', (req,res)=>{
-  var sessionCheck = false;
+  let sessionCheck = false;
   if (typeof req !== 'undefined' && typeof req.user !== 'undefined') {
     console.log(true)
     sessionCheck = true
