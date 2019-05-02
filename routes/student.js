@@ -22,11 +22,16 @@ router.post('/', (req,res)=>{
 router.post('/enter', (req, res) => {
     const {classCode} = req.body;
     Class.findOne({classCode: classCode})
-    .then(clas => {
-        if (clas) {
-            res.send(true);
+    .then(thisClass => {
+        if (thisClass) {
+            const classInput = {
+                classCode:thisClass.classCode,
+                className:thisClass.className,
+                profName:thisClass.profName
+            };
+            res.send(classInput);
         }
-        else res.send(false);//없는 클래스접근 시도
+        else res.send(false);
     });
 });
 
