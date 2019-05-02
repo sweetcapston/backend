@@ -6,6 +6,19 @@ const mongoose = require('mongoose');
 // Load User model
 const Class = mongoose.model('Class');
 const User = mongoose.model('user');
+const Question = mongoose.model('Question');
+
+
+router.post('/', (req,res)=>{
+    let sessionCheck = false;
+    if (typeof req !== 'undefined' && typeof req.user !== 'undefined') {
+        console.log(true)
+        sessionCheck = true
+    }
+    res.send(sessionCheck);
+
+    });
+
 
 router.post('/enter', (req, res) => {
     const {classCode} = req.body;
@@ -28,12 +41,13 @@ router.get('/:classCode/classAdd', (req, res) => {
                 className:thisClass.className,
                 profName:thisClass.profName
             };
+
             User.findByIdAndUpdate(
                 req.user._id,
                 {$push: { "classList": classInput}}
             )
             .then(result => {
-                res.send(thisClass.classCode);
+                res.send(classInput);
             })
         }
         else{
@@ -58,6 +72,37 @@ router.delete('/:classCode/delete', (req, res) => {
     .catch(err=> {
         res.send(err);
     })
+});
+
+router.post('/:classCode/question',(req,res)=>{
+    let classCode=req.params;
+    res.send({
+        questionList: Question.find().equals('classCode',classCode)
+    });
+})
+
+router.post('/:classCode/questionAdd', (req,res)=>{
+    const{classCode}=req.params;
+    const{question,anonymous}=req.body;
+    let userName;
+
+    if(!anonymous)
+        userName=req.user.userName;
+    else
+        userName="anonymous";
+
+    const newQuestion=new Question({
+        classCode: classCode,
+        userID: req.user.email,
+        userName: userName,
+        question: question,
+        anonymous: anonymous
+    });
+    newQuestion.save()
+        .then(result => {
+            res.send(true);
+        })
+            .catch(err => res.send(err));
 });
 
 module.exports = router;

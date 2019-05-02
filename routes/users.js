@@ -16,7 +16,6 @@ router.get('/duplicate/:email', (req, res) => {
   var {email} = req.params
   User.findOne({email: email}).then(user => {
     if (user) {
-      console.log('이미 등록된 아이디 입니다.');
       res.send(true)
     }
     else res.send(false)
@@ -39,10 +38,6 @@ router.post('/signup', (req, res) => {
         newUser
             .save()
             .then(user => {
-              req.flash(
-                  'success_msg',
-                  'You are now registered and can log in'
-              );
               console.log(email + '회원 등록되었습니다.');
               res.send(true);
             })

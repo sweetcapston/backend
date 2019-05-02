@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 // Load User model
 const Class = mongoose.model('Class');
 const User = mongoose.model('user');
+const Question = mongoose.model('Question');
 
 //6자리 난수 코드 생성
 const CreateRandomCode = () => {
@@ -13,18 +14,14 @@ const CreateRandomCode = () => {
     for(let i = 0; i<6; i++)
     {
         let ran=Math.floor(Math.random() * 36);
-        if(ran<10) {
+        if(ran<10)
             ran = ran + 48;
-        }
-        else {
+        else
             ran = ran + 87;
-        }
-
         classCode += String.fromCharCode(ran);
     }
     return classCode
 }
-
 router.post('/classCreate', async (req, res) => {
     const {className} = req.body;
     const classCode = CreateRandomCode();
@@ -35,27 +32,31 @@ router.post('/classCreate', async (req, res) => {
         profName: req.user.name,
     });
     await newClass.save()
-    .catch(err => {
-        console.log(err);
-        res.send(err);
-    })
+        .catch(err => {
+            console.log(err);
+            res.send(err);
+        })
     await User.findByIdAndUpdate(
         req.user._id,
         {$push: { "classList": {
-            classCode:classCode,
-            className:className,
-            profName:req.user.name
-        }}}
+                    classCode:classCode,
+                    className:className,
+                    profName:req.user.name
+                }}}
     )
-    .then(result => {
-        res.send(classCode);
-    })
-    .catch(err => {
-        console.log(err);
-        res.send(err);
-    })
+        .then(result => {
+            const classInput = {
+                classCode:classCode,
+                className:className,
+                profName:req.user.name
+            };
+            res.send(classInput);
+        })
+        .catch(err => {
+            console.log(err);
+            res.send(err);
+        })
 });
-
 
 router.delete('/:classCode/delete', async(req, res) => {
     const {classCode} = req.params
@@ -85,7 +86,13 @@ router.delete('/:classCode/delete', async(req, res) => {
         console.log(err);
         res.send(err);
     })
+});
 
+router.post('/:classCode/question',(req,res)=>{
+    let classCode=req.params;
+    res.send({
+        questionList: Question.find().equals('classCode',classCode)
+    });
 });
 
 module.exports = router;

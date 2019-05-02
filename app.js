@@ -21,6 +21,7 @@ mongoose.connect('mongodb://106.10.46.89:27017/openclass', {
 } ).then(() => console.log('Successfully connected to mongodb'))
   .catch(e => console.error(e));
 mongoose.set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
 
 // EJS
 app.use(expressLayouts);

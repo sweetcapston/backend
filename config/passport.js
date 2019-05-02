@@ -4,7 +4,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 // Load model
-const { User, Class } = require('../models');
+const { User } = require('../models');
+
 module.exports = ()=> {
   passport.use(
     new LocalStrategy({ usernameField: 'email',session: true }, (email, password, done) => {
@@ -13,7 +14,7 @@ module.exports = ()=> {
         email: email
       }).then(user => {
         if (!user) {
-          return done(null, false, { message: 'That email is not registered' });
+          return done(null, false);
         }
         // Match password
         bcrypt.compare(password, user.password, (err, isMatch) => {
@@ -23,8 +24,7 @@ module.exports = ()=> {
 
             return done(null, user);
           } else {
-            console.log(user.email+'님이 비밀번호를 틀리셨습니다.');
-            return done(null, false, { message: 'Password incorrect' });
+            return done(null, false);
           }
         });
       });
