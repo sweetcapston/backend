@@ -10,5 +10,5 @@ script:
 
 cache: npm
 
-# notifications:
-#   slack: ajousweet:rxTiNutNKvONZpgRoDBkFVdY
+ notifications:
+   slack: ajousweet:rxTiNutNKvONZpgRoDBkFVdY

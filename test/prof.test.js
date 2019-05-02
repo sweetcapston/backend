@@ -7,7 +7,7 @@ var agent = chai.request.agent(url);
 
 
 describe('# Professor test', function () {
-    let classcode;
+    let classInput;
     describe('ClassCreate & Delete test', () => {
         it('클래스 생성 성공', done => {
             agent.post('/users/login')
@@ -25,13 +25,13 @@ describe('# Professor test', function () {
                         .end((err, res) => {
                             expect(err).to.be.null;
                             expect(res.text).to.be.an('String');
-                            classcode = res.text;
+                            classInput = res.body;
                             done();
                         })
                 })
         });
         it('클래스 삭제 성공', done => {
-            agent.delete(`/prof/${classcode}/delete`)
+            agent.delete(`/prof/${classInput.classCode}/delete`)
                 .type('form')
                 .end((err, res) => {
                     expect(err).to.be.null;

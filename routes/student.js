@@ -12,7 +12,6 @@ const Question = mongoose.model('Question');
 router.post('/', (req,res)=>{
     let sessionCheck = false;
     if (typeof req !== 'undefined' && typeof req.user !== 'undefined') {
-        console.log(true)
         sessionCheck = true
     }
     res.send(sessionCheck);
@@ -41,7 +40,6 @@ router.get('/:classCode/classAdd', (req, res) => {
                 className:thisClass.className,
                 profName:thisClass.profName
             };
-
             User.findByIdAndUpdate(
                 req.user._id,
                 {$push: { "classList": classInput}}

@@ -77,10 +77,8 @@ router.delete('/:classCode/delete', async(req, res) => {
             thisclass.remove();
             res.send(true);
         }
-        else{
-            console.log("클래스 코드 오류")
+        else
             res.send(false);
-        }
     })
     .catch(err => {
         console.log(err);

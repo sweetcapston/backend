@@ -20,8 +20,6 @@ module.exports = ()=> {
         bcrypt.compare(password, user.password, (err, isMatch) => {
           if (err) throw err;
           if (isMatch) {
-            console.log(user.email+'님이 로그인 하셨습니다.');
-
             return done(null, user);
           } else {
             return done(null, false);
