@@ -25,7 +25,6 @@ router.post('/enter', (req, res) => {
     .then(thisClass => {
         if (thisClass) {
             const classInput = {
-                classCode:thisClass.classCode,
                 className:thisClass.className,
                 profName:thisClass.profName
             };
