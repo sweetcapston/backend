@@ -5,6 +5,7 @@ before_script:
   - npm install
 script:
   - npm start &
+  - sleep 4
   - npm test
 
 cache: npm

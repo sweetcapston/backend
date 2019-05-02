@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+mongoose.set('useFindAndModify', false);
 const UserSchema = new mongoose.Schema({
   name: {type: String, required: true},
   studentId: { type: String, default:"9999" }, //prof == "9999"

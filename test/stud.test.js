@@ -6,8 +6,9 @@ const url = 'http://localhost:5000';
 var agent = chai.request.agent(url);
 
 
-describe('# Student test', function () {
-    describe('ClassAdd test', () => {
+describe('# Student test', () => {
+    const classCode = "loy4au"
+    describe('ClassAdd & Delete test', () => {
         it('클래스 목록에 추가 성공', done => {
             agent.post('/users/login')
             .type('form')
@@ -16,33 +17,24 @@ describe('# Student test', function () {
                 'password': 'qwe123'
             })
             .end((err, res) => {
-                agent.get('/stud/kvsfb6/classAdd')
-                .type('form')
+                agent.get(`/stud/${classCode}/classAdd`)
                 .end((err, res) => {
                     expect(err).to.be.null;
                     expect(res.text).to.be.an('String');
                     done();
                 })
             })
+            
+        });
+        it('클래스목록에서 삭제 성공', done => {
+            agent.delete(`/stud/${classCode}/delete`)
+            .type('form')
+            .end((err, res) => {
+                expect(err).to.be.null;
+                expect(res.body).to.equal(true);
+                done();
+            })
         });
     });
-    // describe('ClassDelete test', () => {
-    //     it('클래스목록에서 삭제 성공', done => {
-    //         agent.post('/users/login')
-    //             .type('form')
-    //             .send({
-    //                 'email': 'testS@email.com',
-    //                 'password': 'qwe123'
-    //             })
-    //             .end((err, res) => {
-    //                 agent.get(`/stud/w3tdt9/delete`)
-    //                     .type('form')
-    //                     .end((err, res) => {
-    //                         expect(err).to.be.null;
-    //                         expect(res.body).to.equal(true);
-    //                         done();
-    //                     })
-    //             })
-    //     });
-    // });
+    
 })
