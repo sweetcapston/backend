@@ -60,6 +60,8 @@ router.post('/login',
 
       res.send({
         Identity: Identity,
+        ID: req.user.userID,
+        name : req.user.name,
         classList: req.user.classList
       });
 
