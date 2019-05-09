@@ -36,39 +36,28 @@ router.post('/enter', (req, res) => {
 
 router.get('/:classCode/classAdd', (req, res) => {
     const {classCode} = req.params
-    User.findOne(req.user._id,{ "classList": {
-            classCode: classCode
-        }}).then(duplicate=>{
-            if(duplicate){
-                res.send(false);
+    Class.findOne({classCode: classCode})
+        .then(thisClass => {
+            if (thisClass) {
+                const classInput = {
+                    classCode:thisClass.classCode,
+                    className:thisClass.className,
+                    profName:thisClass.profName
+                };
+                User.findByIdAndUpdate(
+                    req.user._id,
+                    {$push: { "classList": classInput}}
+                )
+                    .then(result => {
+                        res.send(classInput);
+                    })
             }
             else{
-                Class.findOne({classCode: classCode})
-                    .then(thisClass => {
-                        if (thisClass) {
-                            const classInput = {
-                                classCode:thisClass.classCode,
-                                className:thisClass.className,
-                                profName:thisClass.profName
-                            };
-                            User.findByIdAndUpdate(
-                                req.user._id,
-                                {$push: { "classList": classInput}}
-                            )
-                                .then(result => {
-                                    res.send(classInput);
-                                })
-                        }
-                        else{
-                            res.send(false);
-                        }
-                    }).catch(err => {
-                    res.send(err);
-                });
+                res.send(false);
             }
-    })
-
-
+        }).catch(err => {
+        res.send(err);
+    });
 });
 
 router.delete('/:classCode/delete', (req, res) => {
