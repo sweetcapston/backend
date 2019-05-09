@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const Class = mongoose.model('Class');
 const User = mongoose.model('user');
 const Question = mongoose.model('Question');
+const Survey = mongoose.model('Survey');
 
 //6자리 난수 코드 생성
 const CreateRandomCode = () => {
@@ -28,8 +29,8 @@ router.post('/classCreate', async (req, res) => {
     const newClass = new Class({
         classCode: classCode,
         className: className,
-        profID: req.user.email,
-        profName: req.user.name,
+        profID: req.user.userID,
+        profName: req.user.userName,
     });
     await newClass.save()
         .catch(err => {
@@ -41,14 +42,14 @@ router.post('/classCreate', async (req, res) => {
         {$push: { "classList": {
                     classCode:classCode,
                     className:className,
-                    profName:req.user.name
+                    profName:req.user.userName
                 }}}
     )
         .then(result => {
             const classInput = {
                 classCode:classCode,
                 className:className,
-                profName:req.user.name
+                profName:req.user.userName
             };
             res.send(classInput);
         })
@@ -91,6 +92,23 @@ router.post('/:classCode/question',(req,res)=>{
     res.send({
         questionList: Question.find().equals('classCode',classCode)
     });
+});
+router.post('/:classCode/questionAdd', async (req,res)=>{
+
+    const{classCode}=req.params;
+    const{surveyName,surveyQuestion,surveyType,contentCount,content}=req.body;
+
+    const newSurvey=new Survey({
+        classCode: classCode,
+        surveyName: surveyName,
+        surveyQuestion: surveyQuestion,
+        surveyType: surveyType,
+        contentCount: contentCount,
+        content: content
+    });
+    await newSurvey.save()
+        .catch(err =>{ res.send(err)});
+
 });
 
 module.exports = router;

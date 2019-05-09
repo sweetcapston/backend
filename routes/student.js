@@ -22,9 +22,13 @@ router.post('/', (req,res)=>{
 router.post('/enter', (req, res) => {
     const {classCode} = req.body;
     Class.findOne({classCode: classCode})
-    .then(clas => {
-        if (clas) {
-            res.send(true);
+    .then(thisClass => {
+        if (thisClass) {
+            const classInput = {
+                className:thisClass.className,
+                profName:thisClass.profName
+            };
+            res.send(classInput);
         }
         else res.send(false);//없는 클래스접근 시도
     });
@@ -32,28 +36,38 @@ router.post('/enter', (req, res) => {
 
 router.get('/:classCode/classAdd', (req, res) => {
     const {classCode} = req.params
-    Class.findOne({classCode: classCode})
-    .then(thisClass => {
-        if (thisClass) {
-            const classInput = {
-                classCode:thisClass.classCode,
-                className:thisClass.className,
-                profName:thisClass.profName
-            };
-            User.findByIdAndUpdate(
-                req.user._id,
-                {$push: { "classList": classInput}}
-            )
-            .then(result => {
-                res.send(classInput);
-            })
-        }
-        else{
-            res.send(false);
-        }
-    }).catch(err => {
-        res.send(err);
-    });
+    User.findOne(req.user._id,{ "classList": {
+            classCode: classCode
+        }}).then(duplicate=>{
+            if(duplicate){
+                res.send(false);
+            }
+            else{
+                Class.findOne({classCode: classCode})
+                    .then(thisClass => {
+                        if (thisClass) {
+                            const classInput = {
+                                classCode:thisClass.classCode,
+                                className:thisClass.className,
+                                profName:thisClass.profName
+                            };
+                            User.findByIdAndUpdate(
+                                req.user._id,
+                                {$push: { "classList": classInput}}
+                            )
+                                .then(result => {
+                                    res.send(classInput);
+                                })
+                        }
+                        else{
+                            res.send(false);
+                        }
+                    }).catch(err => {
+                    res.send(err);
+                });
+            }
+    })
+
 
 });
 
@@ -77,30 +91,6 @@ router.post('/:classCode/question',(req,res)=>{
     res.send({
         questionList: Question.find().equals('classCode',classCode)
     });
-})
-
-router.post('/:classCode/questionAdd', (req,res)=>{
-    const{classCode}=req.params;
-    const{question,anonymous}=req.body;
-    let userName;
-
-    if(!anonymous)
-        userName=req.user.userName;
-    else
-        userName="anonymous";
-
-    const newQuestion=new Question({
-        classCode: classCode,
-        userID: req.user.email,
-        userName: userName,
-        question: question,
-        anonymous: anonymous
-    });
-    newQuestion.save()
-        .then(result => {
-            res.send(true);
-        })
-            .catch(err => res.send(err));
 });
 
 module.exports = router;

@@ -29,6 +29,16 @@ describe('# User test', function () {
                     done();
                 });
         });
+        it('클래스 유효성', done => {
+            chai.request(url)
+                .get('/validate/fcpd5b')
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.equal(true)
+                    done();
+                });
+        });
         it('새로운 아이디', done => {
             chai.request(url)
                 .get('/duplicate/nnn@naver.com')

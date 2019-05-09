@@ -6,29 +6,41 @@ const mongoose = require('mongoose');
 const passportConfig= require('../config/passport');
 // Load User model
 const User = mongoose.model('user');
+const Class = mongoose.model('Class');
+
 // Login Page
 router.get('/login', (req, res) => {
   res.send(true)
 });
 
 // Duplicate User
-router.get('/duplicate/:email', (req, res) => {
-  var {email} = req.params
-  User.findOne({email: email}).then(user => {
-    if (user) {
+router.get('/duplicate/:userID', (req, res) => {
+  var {userID} = req.params
+  User.findOne({userID: userID}).then(user => {
+    if (user)
       res.send(true)
-    }
-    else res.send(false)
+    else
+      res.send(false)
+  });
+})
+
+router.get('/validate/:classCode', (req, res) => {
+  var {classCode} = req.params;
+  Class.findOne({classCode: classCode}).then(thisclass => {
+    if (thisclass)
+      res.send(true)
+    else
+      res.send(false)
   });
 })
 
 // Register
 router.post('/signup', (req, res) => {
-  const { name, email,studentId, password } = req.body;
+  const { userName, userID, studentId, password } = req.body;
     const newUser = new User({
-      name: name,
+      userName: userName,
       studentId: studentId,
-      email: email,
+      userID: userID,
       password: password
     });
     bcrypt.genSalt(10, (err, salt) => {
@@ -38,7 +50,7 @@ router.post('/signup', (req, res) => {
         newUser
             .save()
             .then(user => {
-              console.log(email + '회원 등록되었습니다.');
+              console.log(userID + '회원 등록되었습니다.');
               res.send(true);
             })
             .catch(err => console.log(err));
@@ -60,9 +72,11 @@ router.post('/login',
 
       res.send({
         Identity: Identity,
+        userName: req.user.userName,
+        studentId: req.user.studentId,
+        userID: req.user.userID,
         classList: req.user.classList
       });
-
 });
 
 // Logout
@@ -76,7 +90,6 @@ router.get('/logout', (req, res) => {
 router.get('/', (req,res)=>{
   let sessionCheck = false;
   if (typeof req !== 'undefined' && typeof req.user !== 'undefined') {
-    console.log(true)
     sessionCheck = true
   }
   res.send(sessionCheck);
