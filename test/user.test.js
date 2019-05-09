@@ -21,7 +21,7 @@ describe('# User test', function () {
     describe('duplicate test', () => {
         it('중복', done => {
             chai.request(url)
-                .get('/duplicate/acrord@naver.com')
+                .get('/duplicate/testS@email.com')
                 .end((err, res) => {
                     expect(err).to.be.null;
                     expect(res).to.have.status(200);
@@ -29,9 +29,19 @@ describe('# User test', function () {
                     done();
                 });
         });
-        it('클래스 유효성', done => {
+        it('클래스 유효성 fail', done => {
             chai.request(url)
                 .get('/validate/fcpd5b')
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.equal(false)
+                    done();
+                });
+        });
+        it('클래스 유효성 true', done => {
+            chai.request(url)
+                .get('/validate/prtvne')
                 .end((err, res) => {
                     expect(err).to.be.null;
                     expect(res).to.have.status(200);
@@ -77,8 +87,8 @@ describe('# User test', function () {
             .post('/login')
             .type('form')
             .send({//학생 아이디
-                'email': 'acrord@naver.com',
-                'password': 'eeeeee'
+                'userID': 'testS@email.com',
+                'password': 'qwe123'
             })
             .end((err, res) => {
                 expect(err).to.be.null;
@@ -91,7 +101,7 @@ describe('# User test', function () {
             .post('/login')
             .type('form')
             .send({//교수 아이디
-                'email': 'user@email.com',
+                'userID': 'testP@email.com',
                 'password': 'qwe123'
             })
             .end((err, res) => {
@@ -105,8 +115,8 @@ describe('# User test', function () {
             .post('/login')
             .type('form')
             .send({//학생 아이디
-                'email': 'acrord@naver.com',
-                'password': 'eeeeee'
+                'userID': 'testS@email.com',
+                'password': 'qwe123'
             })
             .end((err, res) => {
                 agent.get('/')

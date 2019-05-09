@@ -13,7 +13,7 @@ describe('# Student test', () => {
             agent.post('/users/login')
             .type('form')
             .send({
-                'email': 'testS@email.com',
+                'userID': 'testS@email.com',
                 'password': 'qwe123'
             })
             .end((err, res) => {
