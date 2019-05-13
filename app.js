@@ -6,6 +6,8 @@ const flash = require('connect-flash');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const app = express();
+const Url=require('./config/constant');
+const BaseUrl = "http://"+Url.Url+":8080";
 
 // Passport Config
 require('./config/passport')(passport);
@@ -59,7 +61,7 @@ app.use(function(req, res, next) {
 
 //HTTP 접근 제어(cor) 처리
 const allowCrossDomain = function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', "http://localhost:8080");
+    res.header('Access-Control-Allow-Origin', BaseUrl);
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -76,6 +78,6 @@ app.use('/prof', require('./routes/professor.js'));
 app.use('/stud', require('./routes/student.js'));
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, console.log(`Server started on port ${PORT}`));
+app.listen(PORT,console.log(`Server started on port ${PORT}`));
 
 module.exports = app;

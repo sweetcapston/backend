@@ -93,6 +93,7 @@ router.post('/:classCode/question',(req,res)=>{
         questionList: Question.find().equals('classCode',classCode)
     });
 });
+
 router.post('/:classCode/questionAdd', async (req,res)=>{
 
     const{classCode}=req.params;

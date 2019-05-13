@@ -35,5 +35,14 @@ describe('# Student test', () => {
                 done();
             })
         });
+        it('질문하기 목록 받아오기', done => {
+            agent.delete(`/stud/${classCode}/delete`)
+                .type('form')
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    expect(res.body).to.equal(true);
+                    done();
+                })
+        });
     });
 })
