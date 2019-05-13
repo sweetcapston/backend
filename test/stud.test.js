@@ -7,7 +7,7 @@ var agent = chai.request.agent(url);
 
 
 describe('# Student test', () => {
-    const classCode = "loy4au"
+    const classCode = "prtvne";
     describe('ClassAdd & Delete test', () => {
         it('클래스 목록에 추가 성공', done => {
             agent.post('/users/login')
@@ -36,13 +36,21 @@ describe('# Student test', () => {
             })
         });
         it('질문하기 목록 받아오기', done => {
-            agent.delete(`/stud/${classCode}/delete`)
+            agent.post('/users/login')
                 .type('form')
+                .send({
+                    'userID': 'testS@email.com',
+                    'password': 'qwe123'
+                })
                 .end((err, res) => {
-                    expect(err).to.be.null;
-                    expect(res.body).to.equal(true);
-                    done();
+                    agent.post(`/stud/prtvne/question`)
+                        .end((err, res) => {
+                            expect(err).to.be.null;
+                            //expect(res.text).to.equal(true);
+                            done();
+                        })
                 })
         });
+
     });
 })

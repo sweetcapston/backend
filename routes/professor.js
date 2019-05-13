@@ -88,12 +88,16 @@ router.delete('/:classCode/delete', async(req, res) => {
 });
 
 router.post('/:classCode/question',(req,res)=>{
-    let classCode=req.params;
-    res.send({
-        questionList: Question.find().equals('classCode',classCode)
-    });
-});
+    let {classCode}=req.params;
+    Question.find({classCode: classCode})
+        .then(List => {
+            res.send({questionList: List});
+        })
+        .catch(err=> {
+            res.send(err);
+        })
 
+});
 router.post('/:classCode/questionAdd', async (req,res)=>{
 
     const{classCode}=req.params;

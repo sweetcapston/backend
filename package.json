@@ -4,9 +4,9 @@
   "description": "Node.js authentication with Passport",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node socket/index.js",
     "test": "mocha --timeout 10000",
-    "dev": "nodemon app.js"
+    "dev": "nodemon socket/index.js"
   },
   "keywords": [],
   "author": "",
