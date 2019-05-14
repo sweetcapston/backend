@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const Url=require('./config/constant');
 const BaseUrl = "http://"+Url.Url+":8080";
+const cors = require('./config/cors');
 
 // Passport Config
 require('./config/passport')(passport);
@@ -60,16 +61,7 @@ app.use(function(req, res, next) {
 });
 
 //HTTP 접근 제어(cor) 처리
-const allowCrossDomain = function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', BaseUrl);
-    res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    next();
-}
-
-app.use(allowCrossDomain);
-
+app.use(cors({origins: ["http://localhost:8080", "http://www.openclass.cf","http://192.168.0.26:8080"]}));
 
 // Routes
 app.use('/', require('./routes/index.js'));
@@ -78,6 +70,6 @@ app.use('/prof', require('./routes/professor.js'));
 app.use('/stud', require('./routes/student.js'));
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT,console.log(`Server started on port ${PORT}`));
+app.listen(PORT, console.log(`Server started on port ${PORT}`));
 
 module.exports = app;

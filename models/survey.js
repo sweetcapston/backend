@@ -9,6 +9,7 @@ const SurveySchema = new mongoose.Schema({
   surveyType: { type: Number, required: true },
   contentCount: { type: Number, default: 1 },
   content: [{ type: String }],
+  count:[{type: Number, default: 0 }],
   date: { type: Date, default:Date.now },  //설문 수행 날짜 설문 종료 시 업데이트
 });
 

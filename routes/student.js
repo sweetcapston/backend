@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const Class = mongoose.model('Class');
 const User = mongoose.model('user');
 const Question = mongoose.model('Question');
-
+const Survey = mongoose.model('Survey');
 
 router.post('/', (req,res)=>{
     let sessionCheck = false;
@@ -84,7 +84,17 @@ router.post('/:classCode/question',(req,res)=>{
             .catch(err=> {
                 res.send(err);
             })
+});
 
+router.post('/:classCode/survey',(req,res)=>{
+    let {classCode}=req.params;
+    Survey.find({classCode: classCode})
+        .then(List => {
+            res.send({surveyList: List});
+        })
+        .catch(err=> {
+            res.send(err);
+        })
 });
 
 module.exports = router;

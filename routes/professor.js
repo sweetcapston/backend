@@ -23,6 +23,7 @@ const CreateRandomCode = () => {
     }
     return classCode
 }
+
 router.post('/classCreate', async (req, res) => {
     const {className} = req.body;
     const classCode = CreateRandomCode();
@@ -98,7 +99,30 @@ router.post('/:classCode/question',(req,res)=>{
         })
 
 });
-router.post('/:classCode/questionAdd', async (req,res)=>{
+router.post('/:classCode/question',(req,res)=>{
+    let {classCode}=req.params;
+    Question.find({classCode: classCode})
+        .then(List => {
+            res.send({questionList: List});
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+
+});
+
+router.post('/:classCode/survey',(req,res)=>{
+    let {classCode}=req.params;
+    Survey.find({classCode: classCode})
+        .then(List => {
+            res.send({surveyList: List});
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+});
+
+router.post('/:classCode/surveyAdd', async (req,res)=>{
 
     const{classCode}=req.params;
     const{surveyName,surveyQuestion,surveyType,contentCount,content}=req.body;
@@ -113,7 +137,16 @@ router.post('/:classCode/questionAdd', async (req,res)=>{
     });
     await newSurvey.save()
         .catch(err =>{ res.send(err)});
-
+});
+router.post('/:classCode/:SID/servey',(req,res)=>{
+    let {classCode}=req.params;
+    Survey.find({classCode: classCode})
+        .then(List => {
+            res.send({surveyList: List});
+        })
+        .catch(err=> {
+            res.send(err);
+        })
 });
 
 module.exports = router;
