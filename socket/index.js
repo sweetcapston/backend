@@ -1,11 +1,10 @@
+const app = require('../app');
+// const IOserver = require('../app');
 const mongoose = require('mongoose');
 const Question = mongoose.model('Question');
 const Answer_S = mongoose.model('Answer_S');
 
-// const IOserver = require('../app');
 // const io = require('socket.io')(IOserver);
-
-const app = require('../app');
 const server = app.listen(3000, function() {
     console.log('Socket running on port 3000');
 });
