@@ -5,10 +5,15 @@ const passport = require('passport');
 const flash = require('connect-flash');
 const session = require('express-session');
 const bodyParser = require('body-parser');
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
+const key = fs.readFileSync('/etc/letsencrypt/live/backend.openclass.ga/privkey.pem');
+const cert = fs.readFileSync('/etc/letsencrypt/live/backend.openclass.ga/cert.pem');
+const ca = fs.readFileSync('/etc/letsencrypt/live/backend.openclass.ga/chain.pem');
 const app = express();
-const Url=require('./config/constant');
-const BaseUrl = "http://"+Url.Url+":8080";
 const cors = require('./config/cors');
+const credentials = {key: key, cert:cert, ca:ca }
 
 // Passport Config
 require('./config/passport')(passport);
@@ -61,7 +66,7 @@ app.use(function(req, res, next) {
 });
 
 //HTTP 접근 제어(cor) 처리
-app.use(cors({origins: ["http://localhost:8080", "http://www.openclass.cf","http://192.168.0.26:8080"]}));
+app.use(cors({origins: ["http://localhost:8080", "https://www.openclass.cf", "https://openclass.cf"]}));
 
 // Routes
 app.use('/', require('./routes/index.js'));
@@ -69,7 +74,11 @@ app.use('/users', require('./routes/users.js'));
 app.use('/prof', require('./routes/professor.js'));
 app.use('/stud', require('./routes/student.js'));
 const PORT = process.env.PORT || 5000;
+httpsServer = https.createServer(credentials, app);
+httpsServer.listen(PORT);
+const IOserver = https.createServer(credentials, app);
+IOserver.listen(3000, function() {
+    console.log('Socket running on port 3000');
+});
 
-app.listen(PORT, console.log(`Server started on port ${PORT}`));
-
-module.exports = app;
+module.exports = IOserver;
