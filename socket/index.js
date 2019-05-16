@@ -1,10 +1,8 @@
 const app = require('../app');
-// const IOserver = require('../app');
 const mongoose = require('mongoose');
 const Question = mongoose.model('Question');
 const Answer_S = mongoose.model('Answer_S');
-
-// const io = require('socket.io')(IOserver);
+const Survey = mongoose.model('Survey');
 const server = app.listen(3000, function() {
     console.log('Socket running on port 3000');
 });
@@ -20,17 +18,13 @@ io.on('connection', function(socket) {
         io.sockets.in(classCode).emit('joinSuccess', userID);
     })
     socket.on('chat', function(data) {
-        let time = new Date();
-
-        let T = time.getFullYear().toString()+'-'+(time.getMonth()+1).toString()
-            +'-'+time.getDate().toString()+" "+time.getHours().toString()+":"+time.getMinutes().toString();
         const newQuestion = new Question({
             classCode: data.classCode,
             userID: data.userID,
             userName: data.userName,
             question: data._question,
             anonymous: data.anonymous,
-            date: T
+            date: data.date
         });
         newQuestion.save()
         .then(result => {
@@ -38,23 +32,31 @@ io.on('connection', function(socket) {
         })
         .catch(err => io.emit(err))
     });
-    socket.on('servey', function(data) {
-        // classCode: { type: String, required: true },
-        // userID: { type: String, required: true },
-        // SID: { type: Number, required: true },
-        // content: { type: String, required: true }
+    socket.on('survey', function(data) {
         const newAnswer_S = new Answer_S({
             classCode: data.classCode,
             userID: data.userID,
             SID: data.SID,
             content : data.content
         });
-        newAnser_S.save()
+        newAnswer_S.save()
             .then(result => {
                 console.log('성공');
                 io.sockets.in(data.classCode).emit('MESSAGE', data)
             })
             .catch(err => io.emit(err))
+            .then(result=>{
+                if(data.surveyType<3){
+                        let check = Number(data.content)
+                        let c
+                        while (check > 0) {
+                            c = check % 10
+                            //Survey.findAndUpdate()
+                            //thisSurvey.count[c]++
+                            check / 10
+                        }
+                }
+            })
     });
 
 });

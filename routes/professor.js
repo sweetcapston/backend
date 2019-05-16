@@ -138,7 +138,7 @@ router.post('/:classCode/surveyAdd', async (req,res)=>{
     await newSurvey.save()
         .catch(err =>{ res.send(err)});
 });
-router.post('/:classCode/:SID/servey',(req,res)=>{
+router.post('/:classCode/:SID/survey',(req,res)=>{
     let {classCode}=req.params;
     Survey.find({classCode: classCode})
         .then(List => {
