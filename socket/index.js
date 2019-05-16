@@ -7,32 +7,56 @@ const server = app.listen(3000, function() {
     console.log('Socket running on port 3000');
 });
 const io = require('socket.io')(server);
+const questionIO = io.of('/question');
+const surveyIO = io.of('/survey');
 
-io.on('connection', function(socket) {
-    socket.on('channelJoin', function(data){
-        const {classCode, userID} = data;
+questionIO.on('connect', (socket) => {
+    socket.on('channelJoin', (data) => {
+        const {classCode, Identity, userName, userID} = data;
+        const user = {Identity:Identity, userName:userName, userID:userID, classCode: classCode}
+        socket.user = user
         socket.join(classCode);
-        io.of('/').in(classCode).clients(function (err,clients) {
+        questionIO.to(classCode).clients( (err,clients) => {
             console.log(clients.length);
         });
-        io.sockets.in(classCode).emit('joinSuccess', userID);
+        questionIO.to(classCode).emit('joinSuccess', user);
     })
-    socket.on('chat', function(data) {
-        const newQuestion = new Question({
-            classCode: data.classCode,
-            userID: data.userID,
-            userName: data.userName,
-            question: data._question,
-            anonymous: data.anonymous,
-            date: data.date
+    socket.on('getUsers', async(data) => {
+        const {classCode, socketID} = data;
+
+        let users = []
+        await questionIO.to(classCode).clients((err, clients) =>{
+            clients.forEach(client => {
+                const user = questionIO.connected[client].user;
+                users.push(user);
+            });
         });
+        questionIO.to(socketID).emit('getUsers', users)
+    })
+    socket.on('chat', (data) => {
+        const {classCode} = data
+        const newQuestion = new Question(data);
         newQuestion.save()
         .then(result => {
-            io.sockets.in(data.classCode).emit('MESSAGE', data)
+            questionIO.to(classCode).emit('MESSAGE', data)
         })
-        .catch(err => io.emit(err))
+        .catch(err => console.log(err))
     });
-    socket.on('survey', function(data) {
+    socket.on('disconnect', () => {
+        const user = socket.user;
+        if(user) {
+            questionIO.to(user.classCode).emit('disconnect', user)
+            socket.leave(user.classCode)
+        }
+    });
+});
+
+surveyIO.on('connect', (socket) => {
+    socket.on('servey', function(data) {
+        // classCode: { type: String, required: true },
+        // userID: { type: String, required: true },
+        // SID: { type: Number, required: true },
+        // content: { type: String, required: true }
         const newAnswer_S = new Answer_S({
             classCode: data.classCode,
             userID: data.userID,
@@ -42,7 +66,7 @@ io.on('connection', function(socket) {
         newAnswer_S.save()
             .then(result => {
                 console.log('성공');
-                io.sockets.in(data.classCode).emit('MESSAGE', data)
+                surveyIO.to(data.classCode).emit('MESSAGE', data)
             })
             .catch(err => io.emit(err))
             .then(result=>{
@@ -58,5 +82,4 @@ io.on('connection', function(socket) {
                 }
             })
     });
-
-});
+})
