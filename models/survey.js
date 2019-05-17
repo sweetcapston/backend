@@ -12,7 +12,7 @@ const SurveySchema = new mongoose.Schema({
   count: [{type: Number}], // 선택자 수 
   active: {type:Boolean, default:false}, // 설문 활성화
   public: {type:Boolean, default:true}, // 결과 공개 설정
-  date: { type: String, default:Date.now },  
+  date: { type: String, default:Date.now },
 });
 
 SurveySchema.plugin(AutoIncrement, {id:'SID_seq',inc_field: 'SID'});

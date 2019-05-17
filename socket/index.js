@@ -52,16 +52,12 @@ questionIO.on('connect', (socket) => {
 });
 
 surveyIO.on('connect', (socket) => {
-    socket.on('servey', function(data) {
-        // classCode: { type: String, required: true },
-        // userID: { type: String, required: true },
-        // SID: { type: Number, required: true },
-        // content: { type: String, required: true }
+    socket.on('survey', function(data) {
         const newAnswer_S = new Answer_S({
             classCode: data.classCode,
             userID: data.userID,
             SID: data.SID,
-            content : data.content
+            answer : data.answer
         });
         newAnswer_S.save()
             .then(result => {
@@ -71,14 +67,17 @@ surveyIO.on('connect', (socket) => {
             .catch(err => io.emit(err))
             .then(result=>{
                 if(data.surveyType<3){
-                        let check = Number(data.content)
-                        let c
+                    let check = Number(data.answer);
+                    let c;
+                    Survey.find().all([{SID:data.SID}]).
+                    then(thisSurvey=>{
                         while (check > 0) {
-                            c = check % 10
-                            //Survey.findAndUpdate()
-                            //thisSurvey.count[c]++
-                            check / 10
+                            c = check % 10;
+                            thisSurvey.count[c-1]++;
+                            check= check / 10
                         }
+                        thisSurvey.save()
+                    })
                 }
             })
     });

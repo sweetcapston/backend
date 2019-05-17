@@ -8,6 +8,7 @@ const Class = mongoose.model('Class');
 const User = mongoose.model('user');
 const Question = mongoose.model('Question');
 const Survey = mongoose.model('Survey');
+const Answer_S= mongoose.model('Answer_S');
 
 router.post('/', (req,res)=>{
     let sessionCheck = false;
@@ -96,5 +97,40 @@ router.post('/:classCode/survey',(req,res)=>{
             res.send(err);
         })
 });
+
+router.post('/:classCode/surveyAnswer',(req,res)=>{
+    let {classCode}=req.params;
+    let {userID,SID,answer,surveyType}=req.body;
+    const newAnswer_S = new Answer_S({
+        classCode: classCode,
+        userID: userID,
+        SID: SID,
+        answer : answer
+    });
+    newAnswer_S.save()
+        .then(result => {
+            console.log(result);
+        })
+        .catch(err => console.log(err))
+        .then(result=>{
+            if(Number(surveyType)<3){
+                let check = Number(answer);
+                let c;
+                Survey.find({SID:SID}).
+                then(thisSurvey=>{
+                    console.log(thisSurvey[count]);
+                    while (check > 0) {
+                        c = check % 10;
+                        thisSurvey.count[c-1]++;
+                        check= check / 10
+                    }
+                    thisSurvey.save().then(result=>{
+                        //console.log(result)
+                    })
+                })
+            }
+        })
+});
+
 
 module.exports = router;

@@ -36,21 +36,29 @@ describe('# Student test', () => {
             })
         });
         it('질문하기 목록 받아오기', done => {
-            agent.post('/users/login')
-                .type('form')
-                .send({
-                    'userID': 'testS@email.com',
-                    'password': 'qwe123'
-                })
-                .end((err, res) => {
                     agent.post(`/stud/prtvne/question`)
                         .end((err, res) => {
                             expect(err).to.be.null;
-                            //expect(res.text).to.equal(true);
                             done();
                         })
-                })
+
         });
+        it('설문응답', done => {
+                    agent.post(`/stud/prtvne/surveyAnswer`)
+                        .type('form')
+                        .send({
+                        'userID':'testS@email.com',
+                        'SID':'17',
+                        'answer':'123',
+                        'surveyType': '1'
+                    })
+                        .end((err,res)=>{
+                            done()
+            })
+
+        });
+
+
 
     });
 })
