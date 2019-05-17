@@ -53,7 +53,7 @@ describe('# Student test', () => {
                         'surveyType': '1'
                     })
                         .end((err,res)=>{
-                            done()
+                            done();
             })
 
         });

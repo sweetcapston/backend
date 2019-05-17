@@ -114,19 +114,23 @@ router.post('/:classCode/surveyAnswer',(req,res)=>{
         .catch(err => console.log(err))
         .then(result=>{
             if(Number(surveyType)<3){
-                let check = Number(answer);
+                let check = parseInt(answer);
                 let c;
-                Survey.find({SID:SID}).
+                Survey.findOne({SID:SID}).
                 then(thisSurvey=>{
-                    console.log(thisSurvey[count]);
-                    while (check > 0) {
+                    console.log(thisSurvey)
+                    console.log(thisSurvey.count);
+                    while (check >= 1) {
                         c = check % 10;
                         thisSurvey.count[c-1]++;
-                        check= check / 10
+                        console.log(thisSurvey.count);
+                        //thisSurvey.update({thisSurvey.count[c-1]:3})
+                        check= parseInt(check / 10)
                     }
-                    thisSurvey.save().then(result=>{
-                        //console.log(result)
-                    })
+                    Survey.updateOne({SID:SID},{count:thisSurvey.count})
+                        .then(result=>{
+                            res.send(true)
+                        })
                 })
             }
         })
