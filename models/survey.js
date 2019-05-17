@@ -13,8 +13,7 @@ const SurveySchema = new mongoose.Schema({
           content: [{type: String}], // 문항 내용
           count: [{type: Number}] // 선택자 수//
         },{ _id: false }
-    )]
-  ,
+  )],
   active: {type:Boolean, default:false}, // 설문 활성화
   public: {type:Boolean, default:true}, // 결과 공개 설정
   date: { type: String, default:Date.now },

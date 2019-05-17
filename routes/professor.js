@@ -126,7 +126,6 @@ router.post('/:classCode/surveyAdd', (req,res)=>{
 
     const{survey}=req.body;
     const newSurvey=new Survey(survey);
-    newSurvey.count=new Array(3).fill(0);
     newSurvey.save()
     .then(result => {
         res.send(true);

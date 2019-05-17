@@ -43,22 +43,5 @@ describe('# Student test', () => {
                         })
 
         });
-        it('설문응답', done => {
-                    agent.post(`/stud/prtvne/surveyAnswer`)
-                        .type('form')
-                        .send({
-                        'userID':'testS@email.com',
-                        'SID':'17',
-                        'answer':'123',
-                        'surveyType': '1'
-                    })
-                        .end((err,res)=>{
-                            done();
-            })
-
-        });
-
-
-
     });
 })

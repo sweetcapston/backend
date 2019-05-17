@@ -98,43 +98,4 @@ router.post('/:classCode/survey',(req,res)=>{
         })
 });
 
-router.post('/:classCode/surveyAnswer',(req,res)=>{
-    let {classCode}=req.params;
-    let {userID,SID,answer,surveyType}=req.body;
-    const newAnswer_S = new Answer_S({
-        classCode: classCode,
-        userID: userID,
-        SID: SID,
-        answer : answer
-    });
-    newAnswer_S.save()
-        .then(result => {
-            console.log(result);
-        })
-        .catch(err => console.log(err))
-        .then(result=>{
-            if(Number(surveyType)<3){
-                let check = parseInt(answer);
-                let c;
-                Survey.findOne({SID:SID}).
-                then(thisSurvey=>{
-                    console.log(thisSurvey)
-                    console.log(thisSurvey.count);
-                    while (check >= 1) {
-                        c = check % 10;
-                        thisSurvey.count[c-1]++;
-                        console.log(thisSurvey.count);
-                        //thisSurvey.update({thisSurvey.count[c-1]:3})
-                        check= parseInt(check / 10)
-                    }
-                    Survey.updateOne({SID:SID},{count:thisSurvey.count})
-                        .then(result=>{
-                            res.send(true)
-                        })
-                })
-            }
-        })
-});
-
-
 module.exports = router;
