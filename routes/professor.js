@@ -122,21 +122,15 @@ router.post('/:classCode/survey',(req,res)=>{
         })
 });
 
-router.post('/:classCode/surveyAdd', async (req,res)=>{
+router.post('/:classCode/surveyAdd', (req,res)=>{
 
-    const{classCode}=req.params;
-    const{surveyName,surveyQuestion,surveyType,contentCount,content}=req.body;
-
-    const newSurvey=new Survey({
-        classCode: classCode,
-        surveyName: surveyName,
-        surveyQuestion: surveyQuestion,
-        surveyType: surveyType,
-        contentCount: contentCount,
-        content: content
-    });
-    await newSurvey.save()
-        .catch(err =>{ res.send(err)});
+    const{survey}=req.body;
+    const newSurvey=new Survey(survey);
+    newSurvey.save()
+    .then(result => {
+        res.send(true);
+    })
+    .catch(err =>{ res.send(err)});
 });
 router.post('/:classCode/:SID/survey',(req,res)=>{
     let {classCode}=req.params;

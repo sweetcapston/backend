@@ -40,4 +40,28 @@ describe('# Professor test', function () {
                 })
         });
     });
+    describe('설문 생성', () => {
+        it('설문 생성 성공', done => {
+            const survey = {
+                classCode:"prtvne",
+                surveyName:"testSurvey",
+                surveyQuestion:"test?",
+                surveyType: 2,
+                contentCount: 3,
+                content: ["test1?", "test2", "test3"],
+                count:[0]*3,
+                active:false,
+                public:true,
+                date:"2019년 5월 16일 오후 7:33"
+            }
+            agent.post('/prof/prtvne/surveyAdd')
+            .type('form')
+            .send({survey:survey})
+            .end((err, res) => {
+                expect(err).to.be.null;
+                expect(res.body).to.equal(true);
+                done();
+            })
+        });
+    });
 })
