@@ -89,20 +89,12 @@ router.post('/:classCode/question',(req,res)=>{
 router.post('/:classCode/survey',(req,res)=>{
     let {classCode}=req.params;
     Survey.find({classCode: classCode})
-        .then(List => {
-            Answer_S.find({classCode: classCode,userID: req.user.userID}).
-                then(result=>{
-                // let completeList= new Array(result.length)
-                // for(let i=0;i<result.length;i++){
-                //     completeList[i]=result[i].SID;
-                // }
-                //console.log({surveyList: List,completeList: result});
-                res.send({surveyList: List,completeList: result});
-            })
-        })
-        .catch(err=> {
-            res.send(err);
-        })
+    .then(List => {
+        res.send({surveyList: List});
+    })
+    .catch(err=> {
+        res.send(err);
+    })
 });
 router.post('/:classCode/surveyAnswer_S',(req,res)=>{
     let { answer_S } = req.body;

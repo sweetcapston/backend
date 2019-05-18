@@ -144,13 +144,15 @@ router.post('/:classCode/survey',(req,res)=>{
         })
 });
 
-router.post('/:classCode/surveyStart',(req,res)=>{
-    let {classCode}=req.params;
-    const SID = req.body;
-    Survey.updateOne({ SID: SID }, { active: true })
-        .then(
-            res.send(true)
-        )
+router.put('/:classCode/survey/active',(req,res)=>{
+    const {SID, active} = req.body;
+    Survey.updateOne({ SID: SID }, { active: !active })
+    .then((result) => {
+        res.send(!active);
+    })
+    .catch(err => {
+        console.log(err);
+    })
 });
 
 module.exports = router;
