@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
@@ -8,7 +7,7 @@ const Class = mongoose.model('Class');
 const User = mongoose.model('user');
 const Question = mongoose.model('Question');
 const Survey = mongoose.model('Survey');
-const Answer_S= mongoose.model('Answer_S');
+const Answer_S = mongoose.model('Answer_S');
 
 router.post('/', (req,res)=>{
     let sessionCheck = false;
@@ -91,11 +90,40 @@ router.post('/:classCode/survey',(req,res)=>{
     let {classCode}=req.params;
     Survey.find({classCode: classCode})
         .then(List => {
-            res.send({surveyList: List});
+            Answer_S.find({classCode: classCode,userID: req.user.userID}).
+                then(result=>{
+                // let completeList= new Array(result.length)
+                // for(let i=0;i<result.length;i++){
+                //     completeList[i]=result[i].SID;
+                // }
+                //console.log({surveyList: List,completeList: result});
+                res.send({surveyList: List,completeList: result});
+            })
         })
         .catch(err=> {
             res.send(err);
         })
 });
-
+router.post('/:classCode/surveyAnswer_S',(req,res)=>{
+    let { answer_S } = req.body;
+    const newAnswer_S = new Answer_S(answer_S);
+    newAnswer_S.save();
+    Survey.findOne({ SID: answer_S.SID })
+        .then(thisSurvey => {
+            for (let i = 0; i < answer_S.surveyType.length; i++) {
+                if (Number(answer_S.surveyType[i]) < 3) {
+                    let check = parseInt(answer_S.answer[i]);
+                    while (check >= 1) {
+                        thisSurvey.surveyList[i].count[check % 10 - 1]++;
+                        check = parseInt(check / 10)
+                    }
+                }
+            }
+            Survey.updateOne({ SID: answer_S.SID }, { surveyList: thisSurvey.surveyList })
+                .then(result => {
+                    res.send(true);
+                    //surveyIO.to(result.classCode).emit("survey", answer_S)
+                })
+        })
+})
 module.exports = router;

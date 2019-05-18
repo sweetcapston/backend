@@ -66,7 +66,6 @@ surveyIO.on('connect', (socket) => {
         let { answer_S } = data;
         const newAnswer_S = new Answer_S(answer_S);
         newAnswer_S.save();
-
         Survey.findOne({ SID: answer_S.SID })
         .then(thisSurvey => {
             for (let i = 0; i < answer_S.surveyType.length; i++) {

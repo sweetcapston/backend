@@ -7,7 +7,7 @@ var agent = chai.request.agent(url);
 
 
 describe('# Student test', () => {
-    const classCode = "prtvne";
+    const classCode = "0u6azb";
     describe('ClassAdd & Delete test', () => {
         it('클래스 목록에 추가 성공', done => {
             agent.post('/users/login')
@@ -42,6 +42,32 @@ describe('# Student test', () => {
                             done();
                         })
 
+        });
+        // it('설문 응답하기', done => {
+        //     const answer_S = {
+        //         userID:'testS@email.com',
+        //         SID:'27',
+        //         answer:['4', '34',"작은대왕"],
+        //         surveyType: [1, 2, 3],
+        //         classCode: 'prtvne'
+        //     };
+        //     agent.post('/stud/prtvne/surveyAnswer_S')
+        //         .type('form')
+        //         .send({answer_S:answer_S})
+        //         .end((err, res) => {
+        //             expect(err).to.be.null;
+        //             expect(res.body).to.equal(true);
+        //             done();
+        //         });
+        // });
+        it('설문 받아오기', done => {
+            agent.post('/stud/prtvne/survey')
+                .type('form')
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    expect(res.body).to.equal(true);
+                    done();
+                });
         });
     });
 })

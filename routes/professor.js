@@ -132,7 +132,8 @@ router.post('/:classCode/surveyAdd', (req,res)=>{
     })
     .catch(err =>{ res.send(err)});
 });
-router.post('/:classCode/:SID/survey',(req,res)=>{
+
+router.post('/:classCode/survey',(req,res)=>{
     let {classCode}=req.params;
     Survey.find({classCode: classCode})
         .then(List => {
@@ -141,6 +142,15 @@ router.post('/:classCode/:SID/survey',(req,res)=>{
         .catch(err=> {
             res.send(err);
         })
+});
+
+router.post('/:classCode/surveyStart',(req,res)=>{
+    let {classCode}=req.params;
+    const SID = req.body;
+    Survey.updateOne({ SID: SID }, { active: true })
+        .then(
+            res.send(true)
+        )
 });
 
 module.exports = router;

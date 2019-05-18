@@ -29,6 +29,7 @@
     "passport-local": "^1.0.0",
     "save": "^2.3.3",
     "session-file-store": "^1.2.0",
+    "should": "^13.2.3",
     "socket.io": "^2.2.0",
     "websocket": "^1.0.28"
   },
