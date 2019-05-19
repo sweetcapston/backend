@@ -7,6 +7,7 @@ const Class = mongoose.model('Class');
 const User = mongoose.model('user');
 const Question = mongoose.model('Question');
 const Survey = mongoose.model('Survey');
+const Answer_S = mongoose.model('Answer_S');
 
 //6자리 난수 코드 생성
 const CreateRandomCode = () => {
@@ -83,7 +84,21 @@ router.delete('/:classCode/delete', async(req, res) => {
     })
     await Question.deleteMany({classCode: classCode})
         .then(List => {
-                res.send(true);
+
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+    await Survey.deleteMany({classCode: classCode})
+        .then(List => {
+
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+    await Answer_S.deleteMany({classCode: classCode})
+        .then(List => {
+            res.send(true);
         })
         .catch(err=> {
             res.send(err);
