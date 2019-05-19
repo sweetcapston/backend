@@ -123,7 +123,6 @@ router.post('/:classCode/survey',(req,res)=>{
 });
 
 router.post('/:classCode/surveyAdd', (req,res)=>{
-
     const{survey}=req.body;
     const newSurvey=new Survey(survey);
     newSurvey.save()
@@ -135,13 +134,16 @@ router.post('/:classCode/surveyAdd', (req,res)=>{
 
 router.post('/:classCode/survey',(req,res)=>{
     let {classCode}=req.params;
+    let surveyList;
     Survey.find({classCode: classCode})
-        .then(List => {
-            res.send({surveyList: List});
-        })
-        .catch(err=> {
-            res.send(err);
-        })
+    .then(List => {
+        surveyList = List;
+        
+        // res.send({surveyList: List});
+    })
+    .catch(err=> {
+        console.log(err)
+    })
 });
 
 router.put('/:classCode/survey/active',(req,res)=>{
