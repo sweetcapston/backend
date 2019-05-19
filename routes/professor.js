@@ -69,36 +69,27 @@ router.delete('/:classCode/delete', async(req, res) => {
         }}}
     )
     .catch(err => {
-        console.log(err);
         res.send(err);
     })
 
     await Class.findOne({classCode: classCode})
     .then(thisclass => {
-        if (thisclass){
+        if (thisclass) {
             thisclass.remove();
-            res.send(true);
         }
-        else
-            res.send(false);
     })
     .catch(err => {
-        console.log(err);
         res.send(err);
     })
-});
-
-router.post('/:classCode/question',(req,res)=>{
-    let {classCode}=req.params;
-    Question.find({classCode: classCode})
+    await Question.deleteMany({classCode: classCode})
         .then(List => {
-            res.send({questionList: List});
+                res.send(true);
         })
         .catch(err=> {
             res.send(err);
         })
-
 });
+
 router.post('/:classCode/question',(req,res)=>{
     let {classCode}=req.params;
     Question.find({classCode: classCode})

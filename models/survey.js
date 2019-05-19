@@ -4,7 +4,7 @@ const AutoIncrement = require('mongoose-sequence')(mongoose);
 const SurveySchema = new mongoose.Schema({
   classCode: {type: String, required: true },
   SID: { type: Number },
-  surveyName: { type: String, required: true },  //설문 주제
+  surveyName: { type: String, default:"이름없음" },  //설문 주제
   surveyList :[
     new mongoose.Schema({
           surveyQuestion: {type: String, required: true}, //설문 질문

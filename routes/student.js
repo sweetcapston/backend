@@ -31,7 +31,6 @@ router.post('/enter', (req, res) => {
             res.send(classInput);
         }
         else {
-            console.log("test")
             res.send(false);//없는 클래스접근 시도
         }
     });
@@ -80,9 +79,9 @@ router.delete('/:classCode/delete', (req, res) => {
 
 router.post('/:classCode/question',(req,res)=>{
     let {classCode}=req.params;
-    Question.find({classCode: classCode})
+    Question.find({classCode:classCode})
             .then(List => {
-                res.send({questionList: List});
+                res.send({questionList: List})
             })
             .catch(err=> {
                 res.send(err);

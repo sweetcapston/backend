@@ -17,7 +17,7 @@ questionIO.on('connect', (socket) => {
         socket.user = user
         socket.join(classCode);
         questionIO.to(classCode).clients((err, clients) => {
-            console.log(clients.length);
+            console.log('질문클래스 인원:'+clients.length);
         });
         questionIO.to(classCode).emit('joinSuccess', user);
     })
