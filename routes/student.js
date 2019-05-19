@@ -30,7 +30,10 @@ router.post('/enter', (req, res) => {
             };
             res.send(classInput);
         }
-        else res.send(false);//없는 클래스접근 시도
+        else {
+            console.log("test")
+            res.send(false);//없는 클래스접근 시도
+        }
     });
 });
 
@@ -88,14 +91,19 @@ router.post('/:classCode/question',(req,res)=>{
 
 router.post('/:classCode/survey',(req,res)=>{
     let {classCode}=req.params;
+    const {userID}=req.body;
     Survey.find({classCode: classCode})
-    .then(List => {
-        res.send({surveyList: List});
-    })
-    .catch(err=> {
-        res.send(err);
-    })
+        .then(List => {
+            Answer_S.find({classCode: classCode,userID: userID}).
+            then(completeList=>{
+                res.send({surveyList:List,completeList:completeList});
+            })
+        })
+        .catch(err=> {
+            res.send(err);
+        })
 });
+
 router.post('/:classCode/surveyAnswer_S',(req,res)=>{
     let { answer_S } = req.body;
     const newAnswer_S = new Answer_S(answer_S);

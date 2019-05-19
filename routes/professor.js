@@ -110,18 +110,6 @@ router.post('/:classCode/question',(req,res)=>{
         })
 
 });
-
-router.post('/:classCode/survey',(req,res)=>{
-    let {classCode}=req.params;
-    Survey.find({classCode: classCode})
-        .then(List => {
-            res.send({surveyList: List});
-        })
-        .catch(err=> {
-            res.send(err);
-        })
-});
-
 router.post('/:classCode/surveyAdd', (req,res)=>{
     const{survey}=req.body;
     const newSurvey=new Survey(survey);
@@ -138,8 +126,7 @@ router.post('/:classCode/survey',(req,res)=>{
     Survey.find({classCode: classCode})
     .then(List => {
         surveyList = List;
-        
-        // res.send({surveyList: List});
+        res.send({surveyList: List});
     })
     .catch(err=> {
         console.log(err)

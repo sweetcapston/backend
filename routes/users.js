@@ -69,7 +69,6 @@ router.post('/login',
         Identity = 2;
       else 
         Identity = 1;
-
       res.send({
         Identity: Identity,
         userName: req.user.userName,
@@ -77,6 +76,7 @@ router.post('/login',
         userID: req.user.userID,
         classList: req.user.classList
       });
+      
 });
 
 // Logout
