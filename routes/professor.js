@@ -9,7 +9,7 @@ const Question = mongoose.model('Question');
 const Survey = mongoose.model('Survey');
 const Answer_S = mongoose.model('Answer_S');
 const Quiz = mongoose.model('Quiz');
-const Answer_Q = mongoose.model('answer_Q');
+const Answer_Q = mongoose.model('Answer_Q');
 
 //6자리 난수 코드 생성
 const CreateRandomCode = () => {
