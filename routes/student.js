@@ -9,6 +9,25 @@ const Question = mongoose.model('Question');
 const Survey = mongoose.model('Survey');
 const Answer_S = mongoose.model('Answer_S');
 
+
+const Relocate = (list1,list2,element) => {
+    let list = [];
+    for(let i=0;i<list1.length;i++){
+        for(let j=0;j<list2.length;j++){
+            if(list1[i][`${element}`]==list2[j][`${element}`]){
+                list.push(list2[j])
+                break;
+            }
+            else{
+                if(j==list2.length-1)
+                    list.push("None")
+            }
+        }
+    }
+    return list
+}
+
+
 router.post('/', (req,res)=>{
     let sessionCheck = false;
     if (typeof req !== 'undefined' && typeof req.user !== 'undefined') {
@@ -91,11 +110,13 @@ router.post('/:classCode/question',(req,res)=>{
 router.post('/:classCode/survey',(req,res)=>{
     let {classCode}=req.params;
     const {userID}=req.body;
+
     Survey.find({classCode: classCode})
         .then(List => {
-            Answer_S.find({classCode: classCode,userID: userID}).
-            then(completeList=>{
-                res.send({surveyList:List,completeList:completeList});
+            Answer_S.find({classCode: classCode,userID:userID}).
+            then(myAnswer_S=>{
+                let list = Relocate(List,myAnswer_S,"SID");
+                res.send({surveyList:List, myAnswer_S:list});
             })
         })
         .catch(err=> {
@@ -117,12 +138,15 @@ router.post('/:classCode/surveyAnswer_S',(req,res)=>{
                         check = parseInt(check / 10)
                     }
                 }
+                else{
+                    thisSurvey.surveyList[i].push(answer_S.answer[i]);
+                }
             }
             Survey.updateOne({ SID: answer_S.SID }, { surveyList: thisSurvey.surveyList })
                 .then(result => {
                     res.send(true);
-                    //surveyIO.to(result.classCode).emit("survey", answer_S)
                 })
         })
 })
+
 module.exports = router;

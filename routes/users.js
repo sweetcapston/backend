@@ -43,20 +43,26 @@ router.post('/signup', (req, res) => {
       userID: userID,
       password: password
     });
-    bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(newUser.password, salt, (err, hash) => {
-        if (err) throw err;
-        newUser.password = hash;
-        newUser
-            .save()
-            .then(user => {
-              console.log(userID + '회원 등록되었습니다.');
-              res.send(true);
-            })
-            .catch(err => console.log(err));
-      });
-    });
-    console.log("new user signed up!");
+    User.findOne({userID:userID}).then(ID=>{
+      if(ID){
+        res.send(false);
+      }
+      else{
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newUser.password, salt, (err, hash) => {
+            if (err) throw err;
+            newUser.password = hash;
+            newUser
+                .save()
+                .then(user => {
+                  console.log(userID + '회원 등록되었습니다.');
+                  res.send(true);
+                })
+                .catch(err => console.log(err));
+          });
+        });
+      }
+    })
 });
 passportConfig();
 

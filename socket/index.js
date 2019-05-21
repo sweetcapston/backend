@@ -58,7 +58,7 @@ surveyIO.on('connect', (socket) => {
         socket.user = user
         socket.join(classCode);
         surveyIO.to(classCode).clients((err, clients) => {
-            console.log(clients.length);
+            console.log('설문클래스 인원:'+clients.length);
         });
         surveyIO.to(classCode).emit('joinSuccess', true);
     })

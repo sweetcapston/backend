@@ -8,6 +8,8 @@ const User = mongoose.model('user');
 const Question = mongoose.model('Question');
 const Survey = mongoose.model('Survey');
 const Answer_S = mongoose.model('Answer_S');
+const Quiz = mongoose.model('Quiz');
+const Answer_Q = mongoose.model('answer_Q');
 
 //6자리 난수 코드 생성
 const CreateRandomCode = () => {
@@ -116,6 +118,7 @@ router.post('/:classCode/question',(req,res)=>{
         })
 
 });
+
 router.post('/:classCode/surveyAdd', (req,res)=>{
     const{survey}=req.body;
     const newSurvey=new Survey(survey);
@@ -128,10 +131,8 @@ router.post('/:classCode/surveyAdd', (req,res)=>{
 
 router.post('/:classCode/survey',(req,res)=>{
     let {classCode}=req.params;
-    let surveyList;
     Survey.find({classCode: classCode})
     .then(List => {
-        surveyList = List;
         res.send({surveyList: List});
     })
     .catch(err=> {
@@ -148,6 +149,38 @@ router.put('/:classCode/survey/active',(req,res)=>{
     .catch(err => {
         console.log(err);
     })
+});
+
+router.post('/:classCode/quizAdd', (req,res)=>{
+    const{quiz}=req.body;
+    const newQuiz=new Quiz(quiz);
+    newQuiz.save()
+        .then(result => {
+            res.send(true);
+        })
+        .catch(err =>{ res.send(err)});
+});
+
+router.post('/:classCode/quiz',(req,res)=>{
+    let {classCode}=req.params;
+    Quiz.find({classCode: classCode})
+        .then(List => {
+            res.send({quizList: List});
+        })
+        .catch(err=> {
+            console.log(err)
+        })
+});
+
+router.put('/:classCode/quiz/active',(req,res)=>{
+    const {QID, active} = req.body;
+    Quiz.updateOne({ QID: QID }, { active: !active })
+        .then((result) => {
+            res.send(!active);
+        })
+        .catch(err => {
+            console.log(err);
+        })
 });
 
 module.exports = router;
