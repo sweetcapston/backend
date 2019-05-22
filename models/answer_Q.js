@@ -6,8 +6,7 @@ const Answer_QSchema = new mongoose.Schema({
   userName:{type: String, required: true },
   QID: { type: Number, required: true },
   content: [{ type: String}], // 응답 내용
-  point:[{type: Number}], // 배점
-  correct:[{type: String}], // 정답
+  score:{type: Number}, //점수
 });
 
 

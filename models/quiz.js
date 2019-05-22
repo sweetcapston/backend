@@ -13,15 +13,17 @@ const QuizSchema = new mongoose.Schema({
           content: [{type: String}], // 문항 내용
           count: [{type: Number}], // 선택자 수//
           point:[{type: Number}], // 배점
-          correct:[{type: String}], // 정답
+          correct:{type: String}, // 정답
+          img: { data: Buffer, contentType: String } // 이미지 파일
         },{ _id: false }
     )],
+
   active: {type:Boolean, default:false}, // 퀴즈 활성화
   public: {type:Boolean, default:true}, // 결과 공개 설정
   date: { type: String, default:Date.now }
 });
 
-QuizSchema.plugin(AutoIncrement, {id: 'QZID_seq',inc_field: 'QZID'});
+QuizSchema.plugin(AutoIncrement, {id: 'QID_seq',inc_field: 'QID'});
 const Quiz = mongoose.model('Quiz', QuizSchema);
 
 module.exports = Quiz;

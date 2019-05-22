@@ -75,6 +75,8 @@ surveyIO.on('connect', (socket) => {
                         thisSurvey.surveyList[i].count[check % 10 - 1]++;
                         check = parseInt(check / 10)
                     }
+                } else{
+                    thisSurvey.surveyList[i].content.push(answer_S.answer[i]);
                 }
             }
             Survey.updateOne({ SID: answer_S.SID }, { surveyList: thisSurvey.surveyList })

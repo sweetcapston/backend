@@ -8,6 +8,8 @@ const User = mongoose.model('user');
 const Question = mongoose.model('Question');
 const Survey = mongoose.model('Survey');
 const Answer_S = mongoose.model('Answer_S');
+const Quiz = mongoose.model('Quiz');
+const Answer_Q = mongoose.model('Answer_Q');
 
 
 const Relocate = (list1,list2,element) => {
@@ -20,7 +22,7 @@ const Relocate = (list1,list2,element) => {
             }
             else{
                 if(j==list2.length-1)
-                    list.push("None")
+                    list.push({None: 0})
             }
         }
     }
@@ -115,8 +117,14 @@ router.post('/:classCode/survey',(req,res)=>{
         .then(List => {
             Answer_S.find({classCode: classCode,userID:userID}).
             then(myAnswer_S=>{
-                let list = Relocate(List,myAnswer_S,"SID");
-                res.send({surveyList:List, myAnswer_S:list});
+                let list;
+                if(myAnswer_S.length>0) {
+                    list = Relocate(List, myAnswer_S, "SID");
+                }
+                else{
+                    list = new Array(List.length).fill({None: 0})
+                }
+                res.send({surveyList: List, myAnswer_S: list});
             })
         })
         .catch(err=> {
@@ -137,13 +145,66 @@ router.post('/:classCode/surveyAnswer_S',(req,res)=>{
                         thisSurvey.surveyList[i].count[check % 10 - 1]++;
                         check = parseInt(check / 10)
                     }
-                }
-                else{
-                    thisSurvey.surveyList[i].push(answer_S.answer[i]);
+                } else{
+                    thisSurvey.surveyList[i].content.push(answer_S.answer[i]);
                 }
             }
             Survey.updateOne({ SID: answer_S.SID }, { surveyList: thisSurvey.surveyList })
                 .then(result => {
+                    res.send(true);
+                })
+        })
+})
+
+router.post('/:classCode/quiz',(req,res)=>{
+    let {classCode}=req.params;
+    const {userID}=req.body;
+
+    Quiz.find({classCode: classCode})
+        .then(List => {
+            Answer_Q.find({classCode: classCode,userID:userID}).
+            then(myAnswer_Q=>{
+                let list;
+                if(myAnswer_Q.length>0) {
+                    list = Relocate(List, myAnswer_Q, "QID");
+                    res.send({quizList: List, myAnswer_Q: list});
+                }
+                else{
+                    list = new Array(List.length).fill({None : 0})
+                }
+                res.send({quizList: List, myAnswer_Q: list});
+            })
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+});
+
+router.post('/:classCode/quizAnswer_S',(req,res)=>{
+    let { answer_Q } = req.body;
+    let score = 0;
+    Quiz.findOne({ QID: answer_Q.SID })
+        .then(thisQuiz => {
+            for (let i = 0; i < answer_Q.quizType.length; i++) {
+                if (Number(answer_Q.quizType[i]) < 3) {
+                    if(thisQuiz.quizList[i].correct==answer_Q.answer[i]){
+                        score=score+thisQuiz.quizList[i].point;
+                    }
+                    let check = parseInt(answer_Q.answer[i]);
+                    while (check >= 1) {
+                        thisQuiz.quizList[i].count[check % 10 - 1]++;
+                        check = parseInt(check / 10)
+                    }
+                }
+                else{
+                    thisQuiz.quizList[i].content.push(answer_Q.answer[i]);
+                }
+            }
+            Quiz.updateOne({ QID: answer_Q.QID }, { quizList: thisQuiz.quizList })
+                .then(result => {
+                    answer_Q.score=score;
+                    const newAnswer_Q = new Answer_Q(answer_Q);
+                    newAnswer_Q.save();
                     res.send(true);
                 })
         })
