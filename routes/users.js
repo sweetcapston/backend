@@ -2,11 +2,10 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
-const mongoose = require('mongoose');
 const passportConfig= require('../config/passport');
 // Load User model
-const User = mongoose.model('user');
-const Class = mongoose.model('Class');
+const {Class,User}=require('../models');
+
 
 // Login Page
 router.get('/login', (req, res) => {

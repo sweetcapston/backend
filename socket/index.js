@@ -1,8 +1,6 @@
 const app = require('../app');
-const mongoose = require('mongoose');
-const Question = mongoose.model('Question');
-const Answer_S = mongoose.model('Answer_S');
-const Survey = mongoose.model('Survey');
+const {Question,Survey,Answer_S,Quiz,Answer_Q}=require('../models');
+
 const server = app.listen(3000, function () {
     console.log('Socket running on port 3000');
 });

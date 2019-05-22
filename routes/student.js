@@ -1,16 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
 
 // Load User model
-const Class = mongoose.model('Class');
-const User = mongoose.model('user');
-const Question = mongoose.model('Question');
-const Survey = mongoose.model('Survey');
-const Answer_S = mongoose.model('Answer_S');
-const Quiz = mongoose.model('Quiz');
-const Answer_Q = mongoose.model('Answer_Q');
-
+const {Class,User,Question,Survey,Answer_S,Quiz,Answer_Q}=require('../models');
 
 const Relocate = (list1,list2,element) => {
     let list = [];
