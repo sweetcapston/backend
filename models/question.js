@@ -6,7 +6,7 @@ const QuestionSchema = new mongoose.Schema({
   userName: { type: String, required: true },
   question: { type: String, required: true },
   anonymous: { type: Boolean, default:false },
-  date: { type: Date, default:Date.now }
+  date: { type: String, required: true }
 });
 
 const Question = mongoose.model('Question', QuestionSchema);

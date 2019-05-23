@@ -29,6 +29,26 @@ describe('# User test', function () {
                     done();
                 });
         });
+        it('클래스 유효성 fail', done => {
+            chai.request(url)
+                .get('/validate/fcpd5b')
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.equal(false)
+                    done();
+                });
+        });
+        it('클래스 유효성 true', done => {
+            chai.request(url)
+                .get('/validate/prtvne')
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.equal(true)
+                    done();
+                });
+        });
         it('새로운 아이디', done => {
             chai.request(url)
                 .get('/duplicate/testNew@email.com')
@@ -48,10 +68,10 @@ describe('# User test', function () {
             chai.request(url)
             .post('/signup')
             .type('form')
-            .send({//학생 회원가입
+            .send({//학생 아이디
+                'userID': 'testS@email.com',
                 'name': 'test',
                 'StudentId': '200000000002',
-                'email': 'testd@test.test',
                 'password': 'testest'
             })
             .end((err, res) => {
@@ -69,7 +89,7 @@ describe('# User test', function () {
             .post('/login')
             .type('form')
             .send({//교수 아이디
-                'email': 'testP@email.com',
+                'userID': 'testP@email.com',
                 'password': 'qwe123'
             })
             .end((err, res) => {
@@ -82,7 +102,7 @@ describe('# User test', function () {
             agent.post('/login')
             .type('form')
             .send({//학생 아이디
-                'email': 'testS@email.com',
+                'userID': 'testS@email.com',
                 'password': 'qwe123'
             })
             .end((err, res) => {

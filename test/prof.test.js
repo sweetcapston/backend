@@ -13,7 +13,7 @@ describe('# Professor test', function () {
             agent.post('/users/login')
                 .type('form')
                 .send({
-                    'email': 'testP@email.com',
+                    'userID': 'testP@email.com',
                     'password': 'qwe123'
                 })
                 .end((err, res) => {
@@ -38,6 +38,45 @@ describe('# Professor test', function () {
                     expect(res.body).to.equal(true);
                     done();
                 })
+        });
+    });
+    describe('설문 생성', () => {
+        it('설문 생성 성공', done => {
+            const survey = {
+                classCode:"prtvne",
+                surveyName:"testSurvey",
+                surveyList:[
+                    {
+                        surveyQuestion:"test1",
+                        surveyType: 1,
+                        contentCount: 5,
+                        content: ["강아지", "고양이", "도마뱀","곰돌이","도룡뇽"],
+                        count:new Array(5).fill(0)
+                    },
+                    {
+                        surveyQuestion:"test2",
+                        surveyType: 2,
+                        contentCount: 5,
+                        content: ["강아지", "고양이", "도마뱀","곰돌이","도룡뇽"],
+                        count:new Array(5).fill(0)
+                    },
+                    {
+                        surveyQuestion:"test3",
+                        surveyType: 3
+                    }
+                ],
+                active:false,
+                public:true,
+                date:"2019년 5월 16일 오후 7:33"
+            };
+            agent.post('/prof/prtvne/surveyAdd')
+            .type('form')
+            .send({survey:survey})
+            .end((err, res) => {
+                expect(err).to.be.null;
+                expect(res.body).to.equal(true);
+                done();
+            })
         });
     });
 })

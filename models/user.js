@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 mongoose.set('useFindAndModify', false);
 const UserSchema = new mongoose.Schema({
-  name: {type: String, required: true},
+  userName: {type: String, required: true},
   studentId: { type: String, default:"9999" }, //prof == "9999"
-  email: {type: String, required: true},
+  userID: {type: String, required: true},
   password: {type: String, required: true},
   date: {type: Date, default: Date.now},
   classList : [
