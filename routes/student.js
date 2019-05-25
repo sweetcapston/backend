@@ -101,6 +101,18 @@ router.post('/:classCode/question',(req,res)=>{
             })
 });
 
+router.post('/:classCode/questionEdit',(req,res)=>{
+    let {classCode}=req.params;
+    let {question}=req.body
+    Survey.updateOne({classCode:classCode,userID: question.userID, data: question.data }, { question: question.question })
+        .then(List => {
+            res.send(true)
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+});
+
 router.post('/:classCode/survey',(req,res)=>{
     let {classCode}=req.params;
     const {userID}=req.body;

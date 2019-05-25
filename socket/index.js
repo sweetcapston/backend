@@ -59,7 +59,7 @@ surveyIO.on('connect', (socket) => {
             console.log('설문클래스 인원:'+clients.length);
         });
         surveyIO.to(classCode).emit('joinSuccess', true);
-    })
+    });
     socket.on('survey', (data) => {
         let { answer_S } = data;
         const newAnswer_S = new Answer_S(answer_S);
@@ -83,4 +83,5 @@ surveyIO.on('connect', (socket) => {
             })
         })
     });
+    socket.on
 })

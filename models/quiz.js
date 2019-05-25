@@ -14,10 +14,9 @@ const QuizSchema = new mongoose.Schema({
           count: [{type: Number}], // 선택자 수//
           point:[{type: Number}], // 배점
           correct:{type: String}, // 정답
-          img: { data: Buffer, contentType: String } // 이미지 파일
+          img: [{ type: String}] // 이미지 파일
         },{ _id: false }
     )],
-
   active: {type:Boolean, default:false}, // 퀴즈 활성화
   public: {type:Boolean, default:true}, // 결과 공개 설정
   date: { type: String, default:Date.now }
