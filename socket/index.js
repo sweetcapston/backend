@@ -79,7 +79,7 @@ surveyIO.on('connect', (socket) => {
             }
             Survey.updateOne({ SID: answer_S.SID }, { surveyList: thisSurvey.surveyList })
             .then(result => {
-                surveyIO.to(result.classCode).emit("survey", answer_S)
+                surveyIO.to(answer_S.classCode).emit("survey", answer_S)
             })
         })
     });
