@@ -27,14 +27,6 @@ var data2 = {
 
   };
 
-var data3 = {
-    userID:'testS1@email.com',
-    SID:'32',
-    answer:['4', '34',"작은대왕"],
-    surveyType: [1, 2, 3],
-    classCode: 'prtvne'
-
-};
 
 
 describe("Socket test",function(){
@@ -60,12 +52,12 @@ describe("Socket test",function(){
         client1.emit("channelJoin", {
             Identity:1,
             userName:"학생테스트",
-            userID:"testS@email.com",
+            userID:"testS1@email.com",
             classCode:"prtvne"
-        })
+        });
         client1.on("joinSuccess", data =>{
             data.should.equal(true);
-        })
+        });
         const answer_S = {
             userID:'testS@email.com',
             SID:'24',

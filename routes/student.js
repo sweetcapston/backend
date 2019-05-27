@@ -171,7 +171,6 @@ router.post('/:classCode/quiz',(req,res)=>{
                 let list;
                 if(myAnswer_Q.length>0) {
                     list = Relocate(List, myAnswer_Q, "QID");
-                    res.send({quizList: List, myAnswer_Q: list});
                 }
                 else{
                     list = new Array(List.length).fill({None : 0})
@@ -184,10 +183,11 @@ router.post('/:classCode/quiz',(req,res)=>{
         })
 });
 
-router.post('/:classCode/quizAnswer_S',(req,res)=>{
+router.post('/:classCode/quizAnswer_Q',(req,res)=>{
     let { answer_Q } = req.body;
     let score = 0;
-    Quiz.findOne({ QID: answer_Q.SID })
+    console.log(answer_Q);
+    Quiz.findOne({ QID: answer_Q.QID })
         .then(thisQuiz => {
             for (let i = 0; i < answer_Q.quizType.length; i++) {
                 if (Number(answer_Q.quizType[i]) < 3) {
