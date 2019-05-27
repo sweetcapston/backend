@@ -6,7 +6,7 @@ const Answer_SSchema = new mongoose.Schema({
   userName:{type: String, required: true },
   SID: { type: Number, required: true },
   answer: [{ type: String }],
-  Type:[{type: Number}],
+  surveyType:[{type: Number}],
 });
 
 const Answer_S = mongoose.model('Answer_S', Answer_SSchema);
