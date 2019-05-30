@@ -89,5 +89,6 @@ IOserver.listen(3000, function() {
 
 module.exports = IOserver;
 */
-app.listen(PORT, console.log(`Server running on port ${PORT}`))
+
+app.listen(PORT, console.log(`Server running on port ${PORT}`));
 module.exports = app;
