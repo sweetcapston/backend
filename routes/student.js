@@ -190,9 +190,9 @@ router.post('/:classCode/quizAnswer_Q',(req,res)=>{
     Quiz.findOne({ QID: answer_Q.QID })
         .then(thisQuiz => {
             for (let i = 0; i < answer_Q.quizType.length; i++) {
-                if (Number(answer_Q.quizType[i]) < 3) {
+                if (Number(answer_Q.quizType[i]) < 4) {
                     if(thisQuiz.quizList[i].correct==answer_Q.answer[i]){
-                        score=score+thisQuiz.quizList[i].point;
+                        score=score+thisQuiz.quizList[i].point[0];
                     }
                     let check = parseInt(answer_Q.answer[i]);
                     while (check >= 1) {
