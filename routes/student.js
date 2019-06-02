@@ -1,3 +1,4 @@
+
 const express = require('express');
 const router = express.Router();
 
@@ -101,11 +102,23 @@ router.post('/:classCode/question',(req,res)=>{
             })
 });
 
-router.post('/:classCode/questionEdit',(req,res)=>{
+router.put('/:classCode/questionEdit',(req,res)=>{
     let {classCode}=req.params;
     let {question}=req.body
-    Survey.updateOne({classCode:classCode,userID: question.userID, data: question.data }, { question: question.question })
-        .then(List => {
+    Question.updateOne({classCode:classCode,userID: question.userID, data: question.data },likeList.push(req.user.userID))
+        .then(result => {
+            res.send(true)
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+});
+
+router.put('/:classCode/questionEdit',(req,res)=>{
+    let {classCode}=req.params;
+    let {question}=req.body
+    Question.updateOne({classCode:classCode,userID: question.userID, data: question.data }, { question: question.question })
+        .then(result => {
             res.send(true)
         })
         .catch(err=> {
@@ -190,10 +203,10 @@ router.post('/:classCode/quizAnswer_Q',(req,res)=>{
     Quiz.findOne({ QID: answer_Q.QID })
         .then(thisQuiz => {
             for (let i = 0; i < answer_Q.quizType.length; i++) {
-                if (Number(answer_Q.quizType[i]) < 4) {
-                    if(thisQuiz.quizList[i].correct==answer_Q.answer[i]){
-                        score=score+thisQuiz.quizList[i].point[0];
-                    }
+                if(thisQuiz.quizList[i].correct==answer_Q.answer[i]){
+                    score=score+thisQuiz.quizList[i].point[0];
+                }
+                if (Number(answer_Q.quizType[i]) < 3) {
                     let check = parseInt(answer_Q.answer[i]);
                     while (check >= 1) {
                         thisQuiz.quizList[i].count[check % 10 - 1]++;

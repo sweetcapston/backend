@@ -65,7 +65,7 @@ describe('# Student test', () => {
                 .type('form')
                 .end((err, res) => {
                     expect(err).to.be.null;
-                    expect(res.body).to.equal(true);
+                    expect(res.body).to.be.an("Object");
                     done();
                 });
         });
