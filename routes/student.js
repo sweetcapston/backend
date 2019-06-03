@@ -97,13 +97,13 @@ router.post('/:classCode/question',(req,res)=>{
         {'$match':{'classCode': classCode}},
         {'$group' :
                 {
-                    '_id' : '$userID',
-                  //  'name' : '$userName',
+                    '_id' : '$studentID',
                     'count' :{'$sum':1}
+
                  }
          },
         {'$sort':{'count':-1}},
-        {'$limit': 3}
+        {'$limit': 6}
     ])
         .then(List => {
             console.log(List)
@@ -124,18 +124,6 @@ router.put('/:classCode/questionEdit',(req,res)=>{
     let {classCode}=req.params;
     let {question}=req.body
     Question.updateOne({classCode:classCode,userID: question.userID, data: question.data },likeList.push(req.user.userID))
-        .then(result => {
-            res.send(true)
-        })
-        .catch(err=> {
-            res.send(err);
-        })
-});
-
-router.put('/:classCode/questionEdit',(req,res)=>{
-    let {classCode}=req.params;
-    let {question}=req.body
-    Question.updateOne({classCode:classCode,userID: question.userID, data: question.data }, { question: question.question })
         .then(result => {
             res.send(true)
         })
@@ -244,5 +232,40 @@ router.post('/:classCode/quizAnswer_Q',(req,res)=>{
                 })
         })
 })
-
+router.post('/:classCode/statistics',(req,res)=>{
+    let classCode = req.params;
+    let data;
+    Question.aggregate([
+        {'$match':{'classCode': classCode}},
+        {'$group' :
+                {
+                    '_id' : '$studentID',
+                    'count' :{'$sum':1}
+                }
+        },
+        {'$sort':{'count':-1}},
+        {'$limit': 5}
+    ])
+        .then(List => {
+            data.push(List)
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+    Question.aggregate([
+        {'$match':{'classCode': classCode,'userID':req.userID}},
+        {'$group' :
+                {
+                    '_id' : '$studentID',
+                    'count' :{'$sum':1}
+                }
+        }
+    ])
+        .then(List => {
+            data.push(List)
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+})
 module.exports = router;

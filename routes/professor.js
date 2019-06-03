@@ -116,18 +116,25 @@ router.delete('/:classCode/delete', async(req, res) => {
 
 router.post('/:classCode/question',(req,res)=>{
     let {classCode}=req.params;
-    Question.find({classCode: classCode})
+    Question.find({classCode:classCode})
         .then(List => {
-            Question.aggregate({classCode:classCode},{$unwind:"$studentID"},{$sortByCount:"studentID"}).then(list=>{
-                console.log("123"+list);
-                res.send({questionList: List});
-
-            })
+            res.send({questionList: List})
         })
         .catch(err=> {
             res.send(err);
         })
+});
 
+router.post('/:classCode/surveyDelete', (req,res)=>{
+    const{SID}=req.body;
+    Survey.find({SID:SID})
+        .then(result=>{
+            if(result)
+            result.remove();
+        })
+        .catch(err => {
+            res.send(err);
+        })
 });
 
 router.post('/:classCode/surveyAdd', (req,res)=>{
@@ -191,6 +198,18 @@ router.put('/:classCode/quiz/active',(req,res)=>{
         })
         .catch(err => {
             console.log(err);
+        })
+});
+
+router.post('/:classCode/QuizDelete', (req,res)=>{
+    const{QID}=req.body;
+    Quiz.find({QID:QID})
+        .then(result=>{
+            if(result)
+                result.remove();
+        })
+        .catch(err => {
+            res.send(err);
         })
 });
 
