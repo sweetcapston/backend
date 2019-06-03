@@ -118,7 +118,11 @@ router.post('/:classCode/question',(req,res)=>{
     let {classCode}=req.params;
     Question.find({classCode: classCode})
         .then(List => {
-            res.send({questionList: List});
+            Question.aggregate({classCode:classCode},{$unwind:"$studentID"},{$sortByCount:"studentID"}).then(list=>{
+                console.log("123"+list);
+                res.send({questionList: List});
+
+            })
         })
         .catch(err=> {
             res.send(err);

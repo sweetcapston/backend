@@ -93,6 +93,24 @@ router.delete('/:classCode/delete', (req, res) => {
 
 router.post('/:classCode/question',(req,res)=>{
     let {classCode}=req.params;
+    Question.aggregate([
+        {'$match':{'classCode': classCode}},
+        {'$group' :
+                {
+                    '_id' : '$userID',
+                  //  'name' : '$userName',
+                    'count' :{'$sum':1}
+                 }
+         },
+        {'$sort':{'count':-1}},
+        {'$limit': 3}
+    ])
+        .then(List => {
+            console.log(List)
+        })
+        .catch(err=> {
+            res.send(err);
+        })
     Question.find({classCode:classCode})
             .then(List => {
                 res.send({questionList: List})
