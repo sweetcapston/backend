@@ -93,24 +93,6 @@ router.delete('/:classCode/delete', (req, res) => {
 
 router.post('/:classCode/question',(req,res)=>{
     let {classCode}=req.params;
-    Question.aggregate([
-        {'$match':{'classCode': classCode}},
-        {'$group' :
-                {
-                    '_id' : '$studentID',
-                    'count' :{'$sum':1}
-
-                 }
-         },
-        {'$sort':{'count':-1}},
-        {'$limit': 6}
-    ])
-        .then(List => {
-            console.log(List)
-        })
-        .catch(err=> {
-            res.send(err);
-        })
     Question.find({classCode:classCode})
             .then(List => {
                 res.send({questionList: List})
@@ -234,7 +216,15 @@ router.post('/:classCode/quizAnswer_Q',(req,res)=>{
 })
 router.post('/:classCode/statistics',(req,res)=>{
     let classCode = req.params;
-    let data;
+    let studentID = req.body;
+    let avg=0
+    let max=0;
+    let min=0;
+    let mid=0;
+    let top5=0;
+    let user=0;
+    let data={}
+
     Question.aggregate([
         {'$match':{'classCode': classCode}},
         {'$group' :
@@ -244,28 +234,47 @@ router.post('/:classCode/statistics',(req,res)=>{
                 }
         },
         {'$sort':{'count':-1}},
-        {'$limit': 5}
     ])
         .then(List => {
-            data.push(List)
-        })
-        .catch(err=> {
-            res.send(err);
-        })
-    Question.aggregate([
-        {'$match':{'classCode': classCode,'userID':req.userID}},
-        {'$group' :
-                {
-                    '_id' : '$studentID',
-                    'count' :{'$sum':1}
+            if(List){
+                let professor=-1
+                let student=List.length
+                let top=0
+                max=List[0].count;
+                min=List[parseInt(List.length-1)].count;
+                mid=List[parseInt(List.length/2)].count;
+                for(let i=0;i<List.length;i++){
+                    if(List[i]._id=='9999'){
+                        professor=i
+                    }
+                    else {
+                        if(List[i]._id=='201900001'){//{List[i]._id==studentID}
+                            user=List[i].count;
+                        }
+                        if(i<5){
+                            top5=(top5*top+List[i].count)/(top+1)
+                            top++;
+                        }
+                        if(i==5&&professor>0){
+                            top5=(top5*top+List[i].count)/(top+1)
+                            top++;
+                        }
+                        avg=avg+List[i].count
+                    }
                 }
-        }
-    ])
-        .then(List => {
-            data.push(List)
+                if(professor!=-1){
+                    List.splice(professor,1)
+                    --student;
+                }
+                avg=avg/student;
+                data={top5:top5,user:user,avg:avg,min:min,max:max,mid:mid};
+                console.log(data)
+                console.log(List)
+            }
         })
         .catch(err=> {
             res.send(err);
         })
 })
+
 module.exports = router;
