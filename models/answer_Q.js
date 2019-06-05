@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const Answer_QSchema = new mongoose.Schema({
   classCode: { type: String, required: true }, 
   userID: { type: String, required: true },
+  studentID : {type: String, required: true},
   userName:{type: String, required: true },
   QID: { type: Number, required: true },
   answer: [{ type: String}], // 응답 내용
