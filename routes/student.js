@@ -21,6 +21,18 @@ const Relocate = (list1,list2,element) => {
     }
     return list
 }
+const Check = (list1,list2,element,name) => {
+    let list = [];
+    for(let i=0;i<list1.length;i++){
+        for(let j=0;j<list2.length;j++){
+            if(list1[i][`${element}`]==list2[j][`${element}`]){
+                list.push({Name : list1[i][`${name}`]})
+                break;
+            }
+        }
+    }
+    return list
+}
 
 
 router.post('/', (req,res)=>{
@@ -49,6 +61,61 @@ router.post('/enter', (req, res) => {
         }
     });
 });
+router.post('/:classCode/home',(req,res)=>{
+    const {classCode} = req.params;
+    const {userID}=req.body;
+    let newquestion={};
+    let newsurvey={};
+    let newquiz={};
+    let moment = require("moment");
+    moment.locale("ko");
+    let now=moment().format("LLL");
+    Question.find({classCode:classCode})
+        .then(List => {
+            if(List.length>0) {
+                let n=0;
+                for(let i=0;i<now.length;i++){
+                    if(now[i]='오'){
+                        n=i;
+                        break;
+                    }
+                }
+
+                for(let i=0;i<List.length;i++){
+                    if(now.substring(0,n)==List[i].date.substring(0,n))
+                        newquestion.push(List[i].question)
+                }
+            }
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+    Survey.find({classCode: classCode})
+        .then(List => {
+            Answer_S.find({classCode: classCode ,userID: userID}).
+            then(myAnswer_S=>{
+                if(myAnswer_S.length>0) {
+                    newsurvey = Relocate(List, myAnswer_S, "SID","surveyName");
+                }
+            })
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+    Quiz.find({classCode: classCode})
+        .then(List => {
+            Answer_Q.find({classCode: classCode ,userID: userID}).
+            then(myAnswer_Q=>{
+                if(myAnswer_Q.length>0) {
+                    newquiz = Relocate(List, myAnswer_Q, "QID","quizName");
+                }
+            })
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+    req.send({newquestion:newquestion,newsurvey:newsurvey,newquiz:newquiz});
+})
 
 router.get('/:classCode/classAdd', (req, res) => {
     const {classCode} = req.params
@@ -93,63 +160,6 @@ router.delete('/:classCode/delete', (req, res) => {
 
 router.post('/:classCode/question',(req,res)=>{
     let {classCode}=req.params;
-    let {studentID} = req.body;
-    let avg=0
-    let max=0;
-    let mid=0;
-    let top5=0;
-    let user=0;
-    let data={}
-
-    Question.aggregate([
-        {'$match':{'classCode': classCode}},
-        {'$group' :
-                {
-                    '_id' : '$studentID',
-                    'count' :{'$sum':1}
-                }
-        },
-        {'$sort':{'count':-1}},
-    ])
-        .then(List => {
-            if(List){
-                let professor=-1
-                let student=List.length
-                let top=0
-                max=List[0].count;
-                mid=List[parseInt(List.length/2)].count;
-                for(let i=0;i<List.length;i++){
-                    if(List[i]._id=='9999'){
-                        professor=i
-                    }
-                    else {
-                        if(List[i]._id==studentID){//{List[i]._id==studentID}
-                            user=List[i].count;
-                        }
-                        if(i<5){
-                            top5=(top5*top+List[i].count)/(top+1)
-                            top++;
-                        }
-                        if(i==5&&professor>0){
-                            top5=(top5*top+List[i].count)/(top+1)
-                            top++;
-                        }
-                        avg=avg+List[i].count
-                    }
-                }
-                if(professor!=-1){
-                    List.splice(professor,1)
-                    --student;
-                }
-                avg=avg/student;
-                data={top5:top5,user:user,avg:avg,max:max,mid:mid};
-                console.log(data);
-
-            }
-        })
-        .catch(err=> {
-            res.send(err);
-        })
     Question.find({classCode:classCode})
             .then(List => {
                 res.send({questionList: List})
@@ -159,7 +169,7 @@ router.post('/:classCode/question',(req,res)=>{
             })
 });
 
-router.put('/:classCode/questionEdit',(req,res)=>{
+router.put('/:classCode/questionDelete',(req,res)=>{
     let {classCode}=req.params;
     let {question}=req.body
     Question.updateOne({classCode:classCode,userID: question.userID, data: question.data },likeList.push(req.user.userID))

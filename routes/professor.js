@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 // Load User model
-const {Class,User,Question,Survey,Answer_S,Quiz,Answer_Q}=require('../models');
+const {Class,User,Question,Survey,Answer_S,Quiz,Answer_Q,BlackList}=require('../models');
 
 //6자리 난수 코드 생성
 const CreateRandomCode = () => {
@@ -113,7 +113,16 @@ router.delete('/:classCode/delete', async(req, res) => {
             res.send(err);
         })
 });
-
+router.post('/:classCode/black',(req,res)=>{
+    let {classCode}=req.params;
+    let {blackList}=req.body;
+    const newBlack = new BlackList(blackList);
+    newBlack.save()
+        .then(result => {
+            res.send(true);
+        })
+        .catch(err =>{ res.send(err)});
+})
 router.post('/:classCode/question',(req,res)=>{
     let {classCode}=req.params;
     Question.find({classCode:classCode})
