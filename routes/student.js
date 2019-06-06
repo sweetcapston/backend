@@ -95,7 +95,7 @@ router.post('/:classCode/home',(req,res)=>{
             Answer_S.find({classCode: classCode ,userID: userID}).
             then(myAnswer_S=>{
                 if(myAnswer_S.length>0) {
-                    newsurvey = Relocate(List, myAnswer_S, "SID","surveyName");
+                    newsurvey = Check(List, myAnswer_S, "SID","surveyName");
                 }
             })
         })
@@ -340,7 +340,6 @@ router.post("/:classCode/statistics", (req, res) => {
                     max: max,
                     mid: mid
                 };
-
                 res.send({ data: data });
             }
         })
