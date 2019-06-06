@@ -180,31 +180,6 @@ router.post('/:classCode/questionEdit',(req,res)=>{
         })
 });
 
-router.put('/:classCode/questionLike',(req,res)=>{
-    let {classCode}=req.params;
-    let {QesID,userID}=req.body
-    Question.updateOne({QesID : QesID },likeList.push(userID))
-        .then(result => {
-            res.send(true)
-        })
-        .catch(err=> {
-            res.send(err);
-        })
-});
-
-router.delete('/:classCode/questionUnlike', (req, res) => {
-    const {classCode} = req.params
-    const {QesID,userID}=req.body;
-    Question.updateOne(
-        {QesID:QesID},
-        {$pull: { "likeList": userID}}
-    ).then(result => {
-        res.send(true)
-    })
-        .catch(err=> {
-            res.send(err);
-        })
-});
 
 router.delete('/:classCode/questionDelete',(req,res)=>{
     let {classCode}=req.params;

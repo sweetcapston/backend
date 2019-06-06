@@ -41,6 +41,36 @@ questionIO.on('connect', (socket) => {
             })
             .catch(err => console.log(err))
     });
+    socket.on('like', (data) => {
+        const { QesID, userID } = data
+        Question.updateOne(
+            {QesID : QesID },
+            {$push:{likeList:userID}})
+        .then(result => {
+            questionIO.to(socket.user.classCode).emit("like", {
+                QesID:QesID,
+                userID:userID
+            })
+        })
+        .catch(err=> {
+            console.log(err)
+        })
+    });
+    socket.on("unlike", (data) => {
+        const {QesID, userID}=data;
+        Question.updateOne(
+            {QesID:QesID},
+            {$pull: { "likeList": userID}})
+            .then(result => {
+            questionIO.to(socket.user.classCode).emit("unlike", {
+                QesID:QesID,
+                userID:userID
+            })
+        })
+        .catch(err=> {
+            console.log(err);
+        })
+    })
     socket.on('disconnect', () => {
         const user = socket.user;
         if (user) {
