@@ -21,6 +21,18 @@ const Relocate = (list1,list2,element) => {
     }
     return list
 }
+const Check = (list1,list2,element,name) => {
+    let list = [];
+    for(let i=0;i<list1.length;i++){
+        for(let j=0;j<list2.length;j++){
+            if(list1[i][`${element}`]==list2[j][`${element}`]){
+                list.push({Name : list1[i][`${name}`]})
+                break;
+            }
+        }
+    }
+    return list
+}
 
 
 router.post('/', (req,res)=>{
@@ -49,6 +61,61 @@ router.post('/enter', (req, res) => {
         }
     });
 });
+router.post('/:classCode/home',(req,res)=>{
+    const {classCode} = req.params;
+    const {userID}=req.body;
+    let newquestion={};
+    let newsurvey={};
+    let newquiz={};
+    let moment = require("moment");
+    moment.locale("ko");
+    let now=moment().format("LLL");
+    Question.find({classCode:classCode})
+        .then(List => {
+            if(List.length>0) {
+                let n=0;
+                for(let i=0;i<now.length;i++){
+                    if(now[i]='오'){
+                        n=i;
+                        break;
+                    }
+                }
+
+                for(let i=0;i<List.length;i++){
+                    if(now.substring(0,n)==List[i].date.substring(0,n))
+                        newquestion.push(List[i].question)
+                }
+            }
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+    Survey.find({classCode: classCode})
+        .then(List => {
+            Answer_S.find({classCode: classCode ,userID: userID}).
+            then(myAnswer_S=>{
+                if(myAnswer_S.length>0) {
+                    newsurvey = Relocate(List, myAnswer_S, "SID","surveyName");
+                }
+            })
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+    Quiz.find({classCode: classCode})
+        .then(List => {
+            Answer_Q.find({classCode: classCode ,userID: userID}).
+            then(myAnswer_Q=>{
+                if(myAnswer_Q.length>0) {
+                    newquiz = Relocate(List, myAnswer_Q, "QID","quizName");
+                }
+            })
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+    req.send({newquestion:newquestion,newsurvey:newsurvey,newquiz:newquiz});
+})
 
 router.get('/:classCode/classAdd', (req, res) => {
     const {classCode} = req.params
@@ -102,7 +169,7 @@ router.post('/:classCode/question',(req,res)=>{
             })
 });
 
-router.put('/:classCode/questionEdit',(req,res)=>{
+router.put('/:classCode/questionDelete',(req,res)=>{
     let {classCode}=req.params;
     let {question}=req.body
     Question.updateOne({classCode:classCode,userID: question.userID, data: question.data },likeList.push(req.user.userID))
@@ -265,59 +332,61 @@ router.post('/:classCode/statistics',(req,res)=>{
                     --student;
                 }
                 avg=avg/student;
-                data={top5:top5,user:user,avg:avg,max:max,mid:mid};
+                data={top5:top5.toFixed(1),user:user,avg:avg.toFixed(1),max:max,mid:mid};
                 console.log(data);
-                req.send(data);
+                res.send({data:data});
             }
         })
         .catch(err=> {
             res.send(err);
         })
 })
+
 router.post('/:classCode/statistics/quiz',(req,res)=>{
-    let classCode = req.params;
+    let {classCode} = req.params;
     let {QID} = req.body;
     let avg=0
     let max=0;
     let mid=0;
     let min=0;
     let top5=0;
-    let user=0;
     let data={}
 
     Answer_Q.aggregate([
         {'$match':{'QID': QID}},
         {'$group' :
                 {
-                    '_id' : '$studentID',
-                    'count' :{'$sum':1}
+                    '_id' : '$userID',
+                    'count' :{'$sum':'$score'}
                 }
         },
         {'$sort':{'count':-1}},
     ])
         .then(List => {
             if(List){
-                let student=List.length
-                let top=0
-                max=List[0].score;
-                min=List[parseInt(List.length/2)-1].score;
-                mid=List[parseInt(List.length/2)].score;
+                let student=List.length;
+                let top=0;
+                max=List[0].count;
+                if(parseInt(List.length/2))
+                {min=List[parseInt(List.length/2)-1].count;}
+                mid=List[parseInt(List.length/2)].count;
                 for(let i=0;i<List.length;i++){
                         if(i<5){
-                            top5=top5+List[i].score
+                            top5=top5+List[i].count
                             top++;
                         }
-                        avg=avg+List[i].score
+                        avg=avg+List[i].count
                 }
                 avg=avg/student;
                 top5=top5/top;
-                data={top5:top5,user:user,avg:avg,max:max,min:min,mid:mid};
+                data={top5:top5.toFixed(1),user:user,avg:avg.toFixed(1),max:max,min:min,mid:mid};
                 console.log(data);
-                req.send(data);
+                res.send({data:data});
             }
         })
         .catch(err=> {
             res.send(err);
         })
 })
+
 module.exports = router;
