@@ -7,6 +7,7 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const app = express();
 const cors = require('./config/cors');
+var logger = require('morgan'); 
 /*
 서버에서 활성화
 const https = require('https');
@@ -18,6 +19,7 @@ const credentials = {key: key, cert:cert, ca:ca }
 */
 
 // Passport Config
+app.use(logger('dev'));
 require('./config/passport')(passport);
 // Connect to MongoDB
 mongoose.Promise = global.Promise;
@@ -32,6 +34,7 @@ mongoose.connect('mongodb://106.10.46.89:27017/openclass', {
   .catch(e => console.error(e));
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
+
 
 // EJS
 app.use(expressLayouts);

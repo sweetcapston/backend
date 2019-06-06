@@ -8,7 +8,7 @@ const server = app.listen(3000, function () {
 const io = require('socket.io')(server);
 const questionIO = io.of('/question');
 const surveyIO = io.of('/survey');
-
+const quizIO = io.of('/quiz');
 questionIO.on('connect', (socket) => {
     socket.on('channelJoin', (data) => {
         const { classCode, Identity, userName, userID } = data;
@@ -84,4 +84,59 @@ surveyIO.on('connect', (socket) => {
             })
         })
     });
+})
+quizIO.on('connect', (socket) => {
+    socket.on('channelJoin', (data) => {
+        const { classCode, Identity, userName, userID } = data;
+        const user = { Identity: Identity, userName: userName, userID: userID, classCode: classCode }
+        socket.user = user
+        socket.join(classCode);
+        quizIO.to(classCode).clients((err, clients) => {
+            console.log('퀴즈클래스 인원:'+clients.length);
+        });
+        quizIO.to(classCode).emit('joinSuccess', user);
+    })
+    socket.on("quizStart",(data)=>{
+        const {QID, minutes, date} = data;
+        const totalTime = minutes * 60;
+        
+        Quiz.updateOne({ QID: QID }, { active: true, date:date, minutes:minutes })
+        .then((result) => {
+            socket.finish  = 
+            setTimeout(()=>{
+                setTimeout(() => {
+                    Quiz.updateOne({ QID: QID }, { active: false})
+                    .then((result) => {
+                        quizIO.to(socket.user.classCode).emit("quizStop", {
+                            active:false,
+                            QID:QID
+                        })
+                    });
+                }, 10000)
+            }, 1000 * totalTime)
+            quizIO.to(socket.user.classCode).emit("quizStart", {
+                active:true,
+                minutes:minutes,
+                date:date,
+                QID:QID
+            })
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    })
+    socket.on("quizStop",(data)=>{
+        const QID = data;
+        Quiz.updateOne({ QID: QID }, { active: false})
+        .then((result) => {
+            clearTimeout(socket.finish);
+            quizIO.to(socket.user.classCode).emit("quizStop", {
+                active:false,
+                QID:QID
+            })
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    })
 })
