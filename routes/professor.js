@@ -123,6 +123,35 @@ router.post('/:classCode/black',(req,res)=>{
         })
         .catch(err =>{ res.send(err)});
 })
+router.post('/:classCode/home',(req,res)=>{
+    const {classCode} = req.params;
+    let newquestion={};
+    let moment = require("moment");
+    moment.locale("ko");
+    let now=moment().format("LLL");
+    Question.find({classCode:classCode})
+        .then(List => {
+            if(List.length>0) {
+                let n=0;
+                for(let i=0;i<now.length;i++){
+                    if(now[i]='오'){
+                        n=i;
+                        break;
+                    }
+                }
+
+                for(let i=0;i<List.length;i++){
+                    if(now.substring(0,n)==List[i].date.substring(0,n))
+                        newquestion.push(List[i].question)
+                }
+            }
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+    req.send({newquestion:newquestion});
+})
+
 router.post('/:classCode/question',(req,res)=>{
     let {classCode}=req.params;
     Question.find({classCode:classCode})

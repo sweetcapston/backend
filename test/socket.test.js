@@ -52,7 +52,7 @@ describe("Socket test",function(){
         client1.emit("channelJoin", {
             Identity:1,
             userName:"학생테스트",
-            userID:"testS1@email.com",
+            userID:"testS@email.com",
             classCode:"prtvne"
         });
         client1.on("joinSuccess", data =>{
@@ -64,6 +64,7 @@ describe("Socket test",function(){
             SID:'24',
             answer:['123', '123'],
             surveyType: [1, 1],
+            studentID: '201900000',
             classCode: 'prtvne'
         };
         client1.emit("survey",{answer_S:answer_S})
