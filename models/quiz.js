@@ -18,6 +18,7 @@ const QuizSchema = new mongoose.Schema({
         },{ _id: false }
     )],
   active: {type:Boolean, default:false}, // 퀴즈 활성화
+  minutes:{type:Number, default:0},
   public: {type:Boolean, default:true}, // 결과 공개 설정
   date: { type: String, default:Date.now }
 });

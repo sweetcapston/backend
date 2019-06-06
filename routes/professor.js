@@ -41,7 +41,7 @@ router.post('/classCreate', async (req, res) => {
                     className:className,
                     profName:req.user.userName
                 }}}
-    )
+        )
         .then(result => {
             const classInput = {
                 classCode:classCode,
@@ -227,18 +227,6 @@ router.post('/:classCode/quiz',(req,res)=>{
             console.log(err)
         })
 });
-
-router.put('/:classCode/quiz/active',(req,res)=>{
-    const {QID, active} = req.body;
-    Quiz.updateOne({ QID: QID }, { active: !active })
-        .then((result) => {
-            res.send(!active);
-        })
-        .catch(err => {
-            console.log(err);
-        })
-});
-
 router.post('/:classCode/QuizDelete', (req,res)=>{
     const{QID}=req.body;
     Quiz.find({QID:QID})
