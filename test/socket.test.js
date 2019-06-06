@@ -60,7 +60,7 @@ describe("Socket test",function(){
         });
         const answer_S = {
             userID:'testS@email.com',
-            userName: '학생테스트',
+            userName: '',
             SID:'24',
             answer:['123', '123'],
             surveyType: [1, 1],

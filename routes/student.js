@@ -168,12 +168,51 @@ router.post('/:classCode/question',(req,res)=>{
                 res.send(err);
             })
 });
-
-router.put('/:classCode/questionDelete',(req,res)=>{
+router.post('/:classCode/questionEdit',(req,res)=>{
     let {classCode}=req.params;
-    let {question}=req.body
-    Question.updateOne({classCode:classCode,userID: question.userID, data: question.data },likeList.push(req.user.userID))
+    let {QesID,question}=req.body
+    Question.updateOne({QesID:QesID},{question:question})
         .then(result => {
+            res.send(true)
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+});
+
+router.put('/:classCode/questionLike',(req,res)=>{
+    let {classCode}=req.params;
+    let {QesID,userID}=req.body
+    Question.updateOne({QesID : QesID },likeList.push(userID))
+        .then(result => {
+            res.send(true)
+        })
+        .catch(err=> {
+            res.send(err);
+        })
+});
+
+router.delete('/:classCode/questionUnlike', (req, res) => {
+    const {classCode} = req.params
+    const {QesID,userID}=req.body;
+    Question.updateOne(
+        {QesID:QesID},
+        {$pull: { "likeList": userID}}
+    ).then(result => {
+        res.send(true)
+    })
+        .catch(err=> {
+            res.send(err);
+        })
+});
+
+router.delete('/:classCode/questionDelete',(req,res)=>{
+    let {classCode}=req.params;
+    let {QesID}=req.body
+    Question.findOne({QesID : QesID })
+        .then(result => {
+            if(result)
+            {result.remove()}
             res.send(true)
         })
         .catch(err=> {
@@ -210,21 +249,23 @@ router.post('/:classCode/surveyAnswer_S',(req,res)=>{
     newAnswer_S.save();
     Survey.findOne({ SID: answer_S.SID })
         .then(thisSurvey => {
-            for (let i = 0; i < answer_S.surveyType.length; i++) {
-                if (Number(answer_S.surveyType[i]) < 3) {
-                    let check = parseInt(answer_S.answer[i]);
-                    while (check >= 1) {
-                        thisSurvey.surveyList[i].count[check % 10 - 1]++;
-                        check = parseInt(check / 10)
+            if(thisSurvey) {
+                for (let i = 0; i < answer_S.surveyType.length; i++) {
+                    if (Number(answer_S.surveyType[i]) < 3) {
+                        let check = parseInt(answer_S.answer[i]);
+                        while (check >= 1) {
+                            thisSurvey.surveyList[i].count[check % 10 - 1]++;
+                            check = parseInt(check / 10)
+                        }
+                    } else {
+                        thisSurvey.surveyList[i].content.push(answer_S.answer[i]);
                     }
-                } else{
-                    thisSurvey.surveyList[i].content.push(answer_S.answer[i]);
                 }
+                Survey.updateOne({SID: answer_S.SID}, {surveyList: thisSurvey.surveyList})
+                    .then(result => {
+                        res.send(true);
+                    })
             }
-            Survey.updateOne({ SID: answer_S.SID }, { surveyList: thisSurvey.surveyList })
-                .then(result => {
-                    res.send(true);
-                })
         })
 })
 
