@@ -161,12 +161,12 @@ router.delete('/:classCode/delete', (req, res) => {
 router.post('/:classCode/question',(req,res)=>{
     let {classCode}=req.params;
     Question.find({classCode:classCode})
-            .then(List => {
-                res.send({questionList: List})
-            })
-            .catch(err=> {
-                res.send(err);
-            })
+    .then(List => {
+        res.send({questionList: List})
+    })
+    .catch(err=> {
+        res.send(err);
+    })
 });
 router.post('/:classCode/questionEdit',(req,res)=>{
     let {classCode}=req.params;
@@ -180,20 +180,6 @@ router.post('/:classCode/questionEdit',(req,res)=>{
         })
 });
 
-
-router.delete('/:classCode/questionDelete',(req,res)=>{
-    let {classCode}=req.params;
-    let {QesID}=req.body
-    Question.findOne({QesID : QesID })
-        .then(result => {
-            if(result)
-            {result.remove()}
-            res.send(true)
-        })
-        .catch(err=> {
-            res.send(err);
-        })
-});
 
 router.post('/:classCode/survey',(req,res)=>{
     let {classCode}=req.params;

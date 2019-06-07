@@ -14,7 +14,7 @@ questionIO.on('connect', (socket) => {
         const { classCode, Identity, userName, userID } = data;
         const user = { Identity: Identity, userName: userName, userID: userID, classCode: classCode }
         socket.user = user
-        socket.join(classCode);
+        socket.join(classCode); //같은 room에 입장 
         questionIO.to(classCode).clients((err, clients) => {
             console.log('질문클래스 인원:'+clients.length);
         });
@@ -37,10 +37,23 @@ questionIO.on('connect', (socket) => {
         const newQuestion = new Question(data);
         newQuestion.save()
             .then(result => {
-                questionIO.to(classCode).emit('MESSAGE', data)
+                questionIO.to(classCode).emit('MESSAGE', result)
             })
             .catch(err => console.log(err))
     });
+    socket.on('delete', (data)=>{
+        let QesID = data
+        Question.findOne({QesID : QesID })
+        .then(result => {
+            if(result){
+                result.remove()
+                questionIO.to(socket.user.classCode).emit("delete", result)
+            }
+        })
+        .catch(err=> {
+            console.log(err)
+        })
+    })
     socket.on('like', (data) => {
         const { QesID, userID } = data
         Question.updateOne(
