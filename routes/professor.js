@@ -32,7 +32,7 @@ router.post('/classCreate', async (req, res) => {
     await newClass.save()
         .catch(err => {
             console.log(err);
-            res.send(err);
+            console.log(err);
         })
     await User.findByIdAndUpdate(
         req.user._id,
@@ -52,7 +52,7 @@ router.post('/classCreate', async (req, res) => {
         })
         .catch(err => {
             console.log(err);
-            res.send(err);
+            console.log(err);
         })
 });
 
@@ -65,7 +65,7 @@ router.delete('/:classCode/delete', async(req, res) => {
         }}}
     )
     .catch(err => {
-        res.send(err);
+        console.log(err);
     })
 
     await Class.findOne({classCode: classCode})
@@ -75,42 +75,42 @@ router.delete('/:classCode/delete', async(req, res) => {
         }
     })
     .catch(err => {
-        res.send(err);
+        console.log(err);
     })
     await Question.deleteMany({classCode: classCode})
         .then(List => {
 
         })
         .catch(err=> {
-            res.send(err);
+            console.log(err);
         })
     await Survey.deleteMany({classCode: classCode})
         .then(List => {
 
         })
         .catch(err=> {
-            res.send(err);
+            console.log(err);
         })
     await Answer_S.deleteMany({classCode: classCode})
         .then(List => {
             res.send(true);
         })
         .catch(err=> {
-            res.send(err);
+            console.log(err);
         })
     await Quiz.deleteMany({classCode: classCode})
         .then(List => {
             res.send(true);
         })
         .catch(err=> {
-            res.send(err);
+            console.log(err);
         })
     await Answer_Q.deleteMany({classCode: classCode})
         .then(List => {
             res.send(true);
         })
         .catch(err=> {
-            res.send(err);
+            console.log(err);
         })
 });
 router.post('/:classCode/black',(req,res)=>{
@@ -121,11 +121,12 @@ router.post('/:classCode/black',(req,res)=>{
         .then(result => {
             res.send(true);
         })
-        .catch(err =>{ res.send(err)});
+        .catch(err =>{ console.log(err)});
 })
 router.post('/:classCode/home',(req,res)=>{
     const {classCode} = req.params;
-    let newquestion={};
+    const {userID}=req.body;
+    let newquestion=[];
     let moment = require("moment");
     moment.locale("ko");
     let now=moment().format("LLL");
@@ -133,23 +134,23 @@ router.post('/:classCode/home',(req,res)=>{
         .then(List => {
             if(List.length>0) {
                 let n=0;
+
                 for(let i=0;i<now.length;i++){
-                    if(now[i]='오'){
+                    if(now[i]=='오'){
                         n=i;
                         break;
                     }
                 }
-
+                console.log(now.substring(0,n))
                 for(let i=0;i<List.length;i++){
-                    if(now.substring(0,n)==List[i].date.substring(0,n))
+                    if(now.substring(0,n)==List[i].date.substring(0,n)
+                        &&List[i].userID!=userID) {
                         newquestion.push(List[i].question)
+                    }
                 }
             }
+            res.send(newquestion)
         })
-        .catch(err=> {
-            res.send(err);
-        })
-    req.send({newquestion:newquestion});
 })
 
 router.post('/:classCode/question',(req,res)=>{
@@ -159,7 +160,7 @@ router.post('/:classCode/question',(req,res)=>{
             res.send({questionList: List})
         })
         .catch(err=> {
-            res.send(err);
+            console.log(err);
         })
 });
 
@@ -169,9 +170,16 @@ router.post('/:classCode/surveyDelete', (req,res)=>{
         .then(result=>{
             if(result)
             result.remove();
+            Answer_S.deleteMany({SID: SID})
+                .then(List => {
+                    res.send(true);
+                })
+                .catch(err=> {
+                    console.log(err);
+                })
         })
         .catch(err => {
-            res.send(err);
+            console.log(err);
         })
 });
 
@@ -182,7 +190,7 @@ router.post('/:classCode/surveyAdd', (req,res)=>{
     .then(result => {
         res.send(true);
     })
-    .catch(err =>{ res.send(err)});
+    .catch(err =>{ console.log(err)});
 });
 
 router.post('/:classCode/survey',(req,res)=>{
@@ -214,7 +222,7 @@ router.post('/:classCode/quizAdd', (req,res)=>{
         .then(result => {
             res.send(true);
         })
-        .catch(err =>{ res.send(err)});
+        .catch(err =>{ console.log(err)});
 });
 
 router.post('/:classCode/quiz',(req,res)=>{
@@ -227,19 +235,27 @@ router.post('/:classCode/quiz',(req,res)=>{
             console.log(err)
         })
 });
-router.post('/:classCode/QuizDelete', (req,res)=>{
+router.post('/:classCode/quizDelete', (req,res)=>{
     const{QID}=req.body;
     Quiz.find({QID:QID})
         .then(result=>{
-            if(result)
+            if(result) {
                 result.remove();
+                Answer_Q.deleteMany({QID: QID})
+                    .then(List => {
+                        res.send(true);
+                    })
+                    .catch(err=> {
+                        console.log(err);
+                    })
+            }
         })
         .catch(err => {
-            res.send(err);
+            console.log(err);
         })
 });
 router.post('/:classCode/statistics',(req,res)=>{
-    let classCode = req.params;
+    let {classCode} = req.params;
 
     let avg=0
     let max=0;
@@ -269,9 +285,6 @@ router.post('/:classCode/statistics',(req,res)=>{
                         professor=i
                     }
                     else {
-                        if(List[i]._id==studentID){//{List[i]._id==studentID}
-                            user=List[i].count;
-                        }
                         if(i<5){
                             top5=(top5*top+List[i].count)/(top+1)
                             top++;
@@ -294,7 +307,7 @@ router.post('/:classCode/statistics',(req,res)=>{
             }
         })
         .catch(err=> {
-            res.send(err);
+            console.log(err);
         })
 })
 
@@ -335,13 +348,13 @@ router.post('/:classCode/statistics/quiz',(req,res)=>{
                 }
                 avg=avg/student;
                 top5=top5/top;
-                data={top5:top5.toFixed(1),user:user,avg:avg.toFixed(1),max:max,min:min,mid:mid};
+                data={top5:top5.toFixed(1),avg:avg.toFixed(1),max:max,min:min,mid:mid};
                 console.log(data);
                 res.send({List:List,data:data});
             }
         })
         .catch(err=> {
-            res.send(err);
+            console.log(err);
         })
 })
 
