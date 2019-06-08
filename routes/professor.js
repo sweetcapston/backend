@@ -169,7 +169,7 @@ router.post('/:classCode/surveyAdd', (req,res)=>{
     const newSurvey=new Survey(survey);
     newSurvey.save()
     .then(result => {
-        res.send(true);
+        res.send(result);
     })
     .catch(err =>{ console.log(err)});
 });
@@ -185,6 +185,22 @@ router.post('/:classCode/survey',(req,res)=>{
     })
 });
 
+router.post('/:classCode/surveyEdit',(req,res)=>{
+    let {SID, surveyName, surveyList, date}=req.body
+    Survey.updateOne({SID:SID}, {surveyName : surveyName, surveyList:surveyList, date:date})
+    .then(result => {
+        Answer_S.deleteMany({SID: SID})
+        .then(List => {
+            res.send(req.body)
+        })
+        .catch(err=> {
+            console.log(err);
+        })
+    })
+    .catch(err=> {
+        console.log(err);
+    })
+});
 router.put('/:classCode/survey/active',(req,res)=>{
     const {SID, active} = req.body;
     Survey.updateOne({ SID: SID }, { active: !active })
