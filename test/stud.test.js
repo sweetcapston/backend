@@ -43,24 +43,24 @@ describe('# Student test', () => {
                         })
 
         });
-        it('설문 응답하기', done => {
-            const answer_S = {
-                userID:'testS@email.com',
-                SID:'27',
-                answer:['4', '34',"작은대왕"],
-                studentID:'201900000',
-                surveyType: [1, 2, 3],
-                classCode: 'prtvne'
-            };
-            agent.post('/stud/prtvne/surveyAnswer_S')
-                .type('form')
-                .send({answer_S:answer_S})
-                .end((err, res) => {
-                    expect(err).to.be.null;
-                    expect(res.body).to.equal(true);
-                    done();
-                });
-        });
+        // it('설문 응답하기', done => {
+        //     const answer_S = {
+        //         userID:'testS@email.com',
+        //         SID:'27',
+        //         answer:['4', '34',"작은대왕"],
+        //         studentID:'201900000',
+        //         surveyType: [1, 2, 3],
+        //         classCode: 'prtvne'
+        //     };
+        //     agent.post('/stud/prtvne/surveyAnswer_S')
+        //         .type('form')
+        //         .send({answer_S:answer_S})
+        //         .end((err, res) => {
+        //             expect(err).to.be.null;
+        //             expect(res.body).to.equal(true);
+        //             done();
+        //         });
+        // });
         it('설문 받아오기', done => {
             agent.post('/stud/prtvne/survey')
                 .type('form')

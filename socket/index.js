@@ -54,6 +54,16 @@ questionIO.on('connect', (socket) => {
             console.log(err)
         })
     })
+    socket.on("edit", (data) => {
+        let {QesID, question, anonymous}=data
+        Question.updateOne({QesID:QesID},{question:question, anonymous: anonymous})
+        .then(result => {
+            questionIO.to(socket.user.classCode).emit("edit", data)
+        })
+        .catch(err=> {
+            console.log(err);
+        })
+    })
     socket.on('like', (data) => {
         const { QesID, userID } = data
         Question.updateOne(
