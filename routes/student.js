@@ -273,6 +273,7 @@ router.post('/:classCode/quizAnswer_Q',(req,res)=>{
             for (let i = 0; i < answer_Q.quizType.length; i++) {
                 if(thisQuiz.quizList[i].correct==answer_Q.answer[i]){
                     score=score+thisQuiz.quizList[i].point;
+                    thisQuiz.quizList[i].correctNumber=thisQuiz.quizList[i].correctNumber+1;
                 }
                 if (Number(answer_Q.quizType[i]) < 3) {
                     let check = parseInt(answer_Q.answer[i]);
@@ -360,7 +361,7 @@ router.post("/:classCode/statistics", (req, res) => {
             console.log(err);
         });
 });
-router.post("/:classCode/statistics/quiz", (req, res) => {
+router.post("/:classCode/statistics/quiz", async (req, res) => {
     let { classCode } = req.params;
     let { QID } = req.body;
     let avg = 0;
@@ -369,7 +370,16 @@ router.post("/:classCode/statistics/quiz", (req, res) => {
     let min = 0;
     let top5 = 0;
     let data = {};
-    Answer_Q.aggregate([
+    let correctRate=[];
+    await Quiz.findOne({QID:QID})
+        .then(List=>{
+            if(List) {
+                for (let i = 0; i < List.quizList.length; i++) {
+                    correctRate.push(List.quizList[i].correctNumber);
+                }
+            }
+        })
+    await Answer_Q.aggregate([
         { $match: { QID: QID } },
         {
             $group: {
@@ -384,6 +394,9 @@ router.post("/:classCode/statistics/quiz", (req, res) => {
                 let student = List.length;
                 let top = 0;
                 max = List[0].count;
+                for(let i=0;i<correctRate.length;i++){
+                    correctRate[i]=parseInt(correctRate[i]/student*100);
+                }
                 if (parseInt(List.length / 2) > 1) {
                     min = List[parseInt(List.length / 2) - 1].count;
                 }
@@ -402,9 +415,11 @@ router.post("/:classCode/statistics/quiz", (req, res) => {
                     avg: avg.toFixed(1),
                     max: max,
                     min: min,
-                    mid: mid
+                    mid: mid,
                 };
-                res.send({ data: data });
+                console.log(data);
+                console.log(correctRate);
+                res.send({ data: data, correctRate: correctRate });
             }
         })
         .catch(err => {
