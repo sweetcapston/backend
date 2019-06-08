@@ -311,51 +311,74 @@ router.post('/:classCode/statistics',(req,res)=>{
         })
 })
 
-router.post('/:classCode/statistics/quiz',(req,res)=>{
-    let {classCode} = req.params;
-    let {QID} = req.body;
-    let avg=0
-    let max=0;
-    let mid=0;
-    let min=0;
-    let top5=0;
-    let data={}
-
-    Answer_Q.aggregate([
-        {'$match':{'QID': QID}},
-        {'$group' :
-                {
-                    '_id' : '$userID',
-                    'count' :{'$sum':'$score'}
+router.post('/:classCode/statistics/quiz', async(req,res)=>{
+    let { classCode } = req.params;
+    let { QID } = req.body;
+    let avg = 0;
+    let max = 0;
+    let mid = 0;
+    let min = 0;
+    let top5 = 0;
+    let data = {};
+    let correctRate=[];
+    let point=[];
+    await Quiz.findOne({QID:QID})
+        .then(List=>{
+            if(List) {
+                for (let i = 0; i < List.quizList.length; i++) {
+                    correctRate.push(List.quizList[i].correctNumber);
+                    point.push(List.quizList[i].point);
                 }
-        },
-        {'$sort':{'count':-1}},
-    ])
-        .then(List => {
-            if(List){
-                let student=List.length;
-                let top=0;
-                max=List[0].count;
-                if(parseInt(List.length/2))
-                {min=List[parseInt(List.length/2)-1].count;}
-                mid=List[parseInt(List.length/2)].count;
-                for(let i=0;i<List.length;i++){
-                    if(i<5){
-                        top5=top5+List[i].count
-                        top++;
-                    }
-                    avg=avg+List[i].count
-                }
-                avg=avg/student;
-                top5=top5/top;
-                data={top5:top5.toFixed(1),avg:avg.toFixed(1),max:max,min:min,mid:mid};
-                console.log(List);
-                res.send({List:List,data:data,analysis:analysis});
             }
         })
-        .catch(err=> {
-            console.log(err);
+    await Answer_Q.aggregate([
+        { $match: { QID: QID } },
+        {
+            $group: {
+                _id: "$userName",
+                count: { $sum: "$score" }
+            }
+        },
+        { $sort: { count: -1 } }
+    ])
+        .then(List => {
+            if (List) {
+                let student = List.length;
+                let top = 0;
+                max = List[0].count;
+                for(let i=0;i<correctRate.length;i++){
+                    correctRate[i]=parseInt(correctRate[i]/student*100);
+                }
+                if (parseInt(List.length / 2) > 1) {
+                    min = List[parseInt(List.length / 2) - 1].count;
+                }
+                mid = List[parseInt(List.length / 2)].count;
+                for (let i = 0; i < List.length; i++) {
+                    if (i < 5) {
+                        top5 = top5 + List[i].count;
+                        top++;
+                    }
+                    avg = avg + List[i].count;
+                }
+                avg = avg / student;
+                top5 = top5 / top;
+                data = {
+                    top5: top5.toFixed(1),
+                    avg: avg.toFixed(1),
+                    max: max,
+                    min: min,
+                    mid: mid,
+                };
+                console.log(List)
+                console.log(point)
+                console.log(data);
+                console.log(correctRate);
+                res.send({List:List,point:point, correctRate: correctRate,data: data });
+            }
         })
+        .catch(err => {
+            console.log(err);
+        });
 })
 
 module.exports = router;
