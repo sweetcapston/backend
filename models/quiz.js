@@ -12,9 +12,9 @@ const QuizSchema = new mongoose.Schema({
           contentCount: {type: Number, default: 1}, //객관식 문항 수
           content: [{type: String}], // 문항 내용
           count: [{type: Number}], // 선택자 수//
-          point:[{type: Number}], // 배점
+          point:{type: Number}, // 배점
           correct:{type: String}, // 정답
-          img: [{ type: String}] // 이미지 파일
+          correctNumber:{type: Number, default: 0} // 정답자수
         },{ _id: false }
     )],
   active: {type:Boolean, default:false}, // 퀴즈 활성화

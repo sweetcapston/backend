@@ -349,8 +349,8 @@ router.post('/:classCode/statistics/quiz',(req,res)=>{
                 avg=avg/student;
                 top5=top5/top;
                 data={top5:top5.toFixed(1),avg:avg.toFixed(1),max:max,min:min,mid:mid};
-                console.log(data);
-                res.send({List:List,data:data});
+                console.log(List);
+                res.send({List:List,data:data,analysis:analysis});
             }
         })
         .catch(err=> {
