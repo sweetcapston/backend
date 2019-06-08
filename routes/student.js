@@ -179,18 +179,6 @@ router.post('/:classCode/question',(req,res)=>{
             })
 });
 
-router.post('/:classCode/questionEdit',(req,res)=>{
-    let {classCode}=req.params;
-    let {QesID,question}=req.body
-    Question.updateOne({QesID:QesID},{question:question})
-        .then(result => {
-            res.send(true)
-        })
-        .catch(err=> {
-            console.log(err);
-        })
-});
-
 router.delete('/:classCode/questionDelete',(req,res)=>{
     let {classCode}=req.params;
     let {QesID}=req.body
@@ -280,12 +268,11 @@ router.post('/:classCode/quiz',(req,res)=>{
 router.post('/:classCode/quizAnswer_Q',(req,res)=>{
     let { answer_Q } = req.body;
     let score = 0;
-    console.log(answer_Q);
     Quiz.findOne({ QID: answer_Q.QID })
         .then(thisQuiz => {
             for (let i = 0; i < answer_Q.quizType.length; i++) {
                 if(thisQuiz.quizList[i].correct==answer_Q.answer[i]){
-                    score=score+thisQuiz.quizList[i].point[0];
+                    score=score+thisQuiz.quizList[i].point;
                 }
                 if (Number(answer_Q.quizType[i]) < 3) {
                     let check = parseInt(answer_Q.answer[i]);

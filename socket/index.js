@@ -137,6 +137,26 @@ surveyIO.on('connect', (socket) => {
             })
         })
     });
+    socket.on("delete", (data) => {
+        const SID = data;
+        Survey.findOne({SID:SID})
+        .then(result=>{
+            console.log(result)
+            if(result) {
+                result.remove();
+                Answer_S.deleteMany({SID: SID})
+                .then(List => {
+                    surveyIO.to(socket.user.classCode).emit("delete", result)
+                })
+                .catch(err=> {
+                    console.log(err);
+                })
+            }
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    })
 })
 quizIO.on('connect', (socket) => {
     socket.on('channelJoin', (data) => {
@@ -187,6 +207,26 @@ quizIO.on('connect', (socket) => {
                 active:false,
                 QID:QID
             })
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    })
+
+    socket.on("delete", (data) => {
+        const QID = data;
+        Quiz.findOne({QID:QID})
+        .then(result=>{
+            if(result) {
+                result.remove();
+                Answer_Q.deleteMany({QID: QID})
+                .then(List => {
+                    quizIO.to(socket.user.classCode).emit("delete", result);
+                })
+                .catch(err=> {
+                    console.log(err);
+                })
+            }
         })
         .catch(err => {
             console.log(err);

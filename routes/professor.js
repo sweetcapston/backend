@@ -164,25 +164,6 @@ router.post('/:classCode/question',(req,res)=>{
         })
 });
 
-router.post('/:classCode/surveyDelete', (req,res)=>{
-    const{SID}=req.body;
-    Survey.find({SID:SID})
-        .then(result=>{
-            if(result)
-            result.remove();
-            Answer_S.deleteMany({SID: SID})
-                .then(List => {
-                    res.send(true);
-                })
-                .catch(err=> {
-                    console.log(err);
-                })
-        })
-        .catch(err => {
-            console.log(err);
-        })
-});
-
 router.post('/:classCode/surveyAdd', (req,res)=>{
     const{survey}=req.body;
     const newSurvey=new Survey(survey);
@@ -220,7 +201,7 @@ router.post('/:classCode/quizAdd', (req,res)=>{
     const newQuiz=new Quiz(quiz);
     newQuiz.save()
         .then(result => {
-            res.send(true);
+            res.send(result);
         })
         .catch(err =>{ console.log(err)});
 });
@@ -235,25 +216,23 @@ router.post('/:classCode/quiz',(req,res)=>{
             console.log(err)
         })
 });
-router.post('/:classCode/quizDelete', (req,res)=>{
-    const{QID}=req.body;
-    Quiz.find({QID:QID})
-        .then(result=>{
-            if(result) {
-                result.remove();
-                Answer_Q.deleteMany({QID: QID})
-                    .then(List => {
-                        res.send(true);
-                    })
-                    .catch(err=> {
-                        console.log(err);
-                    })
-            }
+router.post('/:classCode/quizEdit',(req,res)=>{
+    let {QID, quizName, quizList, date}=req.body
+    Quiz.updateOne({QID:QID}, {quizName:quizName, quizList:quizList, date:date})
+    .then(result => {
+        Answer_Q.deleteMany({QID: QID})
+        .then(List => {
+            res.send(req.body)
         })
-        .catch(err => {
+        .catch(err=> {
             console.log(err);
         })
+    })
+    .catch(err=> {
+        console.log(err);
+    })
 });
+
 router.post('/:classCode/statistics',(req,res)=>{
     let {classCode} = req.params;
 
@@ -302,7 +281,6 @@ router.post('/:classCode/statistics',(req,res)=>{
                 }
                 avg=avg/student;
                 data={top5:top5.toFixed(1),avg:avg.toFixed(1),max:max,mid:mid};
-                console.log(data);
                 res.send({List:List,data:data});
             }
         })
@@ -349,7 +327,6 @@ router.post('/:classCode/statistics/quiz',(req,res)=>{
                 avg=avg/student;
                 top5=top5/top;
                 data={top5:top5.toFixed(1),avg:avg.toFixed(1),max:max,min:min,mid:mid};
-                console.log(data);
                 res.send({List:List,data:data});
             }
         })
