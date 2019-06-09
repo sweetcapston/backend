@@ -68,9 +68,9 @@ router.post('/enter', (req, res) => {
 router.post('/:classCode/home',async(req,res)=>{
     const {classCode} = req.params;
     const {userID}=req.body;
-    let newquestion=[];
-    let newsurvey=[];
-    let newquiz=[];
+    let newQuestion=[];
+    let newSurvey=[];
+    let newQuiz=[];
     let moment = require("moment");
     moment.locale("ko");
     let now=moment().format("LLL");
@@ -89,11 +89,10 @@ router.post('/:classCode/home',async(req,res)=>{
                 for(let i=0;i<List.length;i++){
                     if(now.substring(0,n)==List[i].date.substring(0,n)
                         &&List[i].userID!=userID) {
-                        newquestion.push(List[i].question)
+                        newQuestion.push(List[i].question)
                     }
                 }
             }
-            console.log(newquestion)
         })
         .catch(err=> {
             console.log(err);
@@ -102,9 +101,12 @@ router.post('/:classCode/home',async(req,res)=>{
         .then(List => {
             Answer_S.find({classCode: classCode ,userID: userID}).
             then(myAnswer_S=>{
-                if(myAnswer_S.length>0) {
-                    newsurvey = Check(List, myAnswer_S, "SID","surveyName");
+                for(let i=0;i<List.length;i++){
+                    if(List[i].active==false){
+                        List.splice(i,1);
+                    }
                 }
+                    newSurvey = Check(List, myAnswer_S, "SID","surveyName");
             })
         })
         .catch(err=> {
@@ -114,12 +116,15 @@ router.post('/:classCode/home',async(req,res)=>{
         .then(List => {
             Answer_Q.find({classCode: classCode ,userID: userID}).
             then(myAnswer_Q=>{
-                if(myAnswer_Q.length>0) {
-                    newquiz = Check(List, myAnswer_Q, "QID","quizName");
-                }
-                let data = {newquestion:newquestion,newsurvey:newsurvey,newquiz:newquiz}
+                    for(let i=0;i<List.length;i++){
+                        if(List[i].active==false){
+                            List.splice(i,1);
+                        }
+                    }
+                    newQuiz = Check(List, myAnswer_Q, "QID","quizName");
+                let data = {newQuestion:newQuestion,newSurvey:newSurvey,newQuiz:newQuiz};
                 console.log(data);
-                res.send({newquestion:newquestion,newsurvey:newsurvey,newquiz:newquiz});
+                res.send({newQuestion:newQuestion,newSurvey:newSurvey,newQuiz:newQuiz});
             })
         })
         .catch(err=> {
@@ -154,7 +159,7 @@ router.get('/:classCode/classAdd', (req, res) => {
 });
 
 router.delete('/:classCode/delete', (req, res) => {
-    const {classCode} = req.params
+    const {classCode} = req.params;
     User.findByIdAndUpdate(
         req.user._id,
         {$pull: { "classList": {

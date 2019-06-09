@@ -123,10 +123,22 @@ router.post('/:classCode/black',(req,res)=>{
         })
         .catch(err =>{ console.log(err)});
 })
+router.post('/:classCode/alarm',(req,res)=>{
+    const {classCode} = req.params;
+    const {alarm} = req.body
+    Class.updateOne({ classCode: classCode }, { alarm : !alarm })
+        .then((result) => {
+            res.send(!alarm);
+        })
+        .catch(err => {
+            console.log(err);
+        })
+})
+
 router.post('/:classCode/home',(req,res)=>{
     const {classCode} = req.params;
     const {userID}=req.body;
-    let newquestion=[];
+    let newQuestion=[];
     let moment = require("moment");
     moment.locale("ko");
     let now=moment().format("LLL");
@@ -145,11 +157,11 @@ router.post('/:classCode/home',(req,res)=>{
                 for(let i=0;i<List.length;i++){
                     if(now.substring(0,n)==List[i].date.substring(0,n)
                         &&List[i].userID!=userID) {
-                        newquestion.push(List[i].question)
+                        newQuestion.push(List[i].question)
                     }
                 }
             }
-            res.send(newquestion)
+            res.send(newQuestion)
         })
 })
 
