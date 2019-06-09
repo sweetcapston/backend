@@ -335,7 +335,7 @@ router.post('/:classCode/statistics/quiz', async(req,res)=>{
         { $match: { QID: QID } },
         {
             $group: {
-                _id: "$userName",
+                _id: "$studentID",
                 count: { $sum: "$score" }
             }
         },
