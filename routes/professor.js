@@ -113,14 +113,32 @@ router.delete('/:classCode/delete', async(req, res) => {
             console.log(err);
         })
 });
-router.post('/:classCode/black',(req,res)=>{
+router.post('/:classCode/black',async (req,res)=>{
     let {classCode}=req.params;
     let {blackList}=req.body;
-    const newBlack = new BlackList(blackList);
-    newBlack.save()
-        .then(result => {
-            res.send(true);
-        })
+    let userID,userName;
+    await Question.findOne({QesID:blackList.QesID})
+        .then(Qes=>{
+            if(Qes){
+                userID=Qes.userID;
+                userName=Qes.userName;
+            }
+        }).catch(err =>{ console.log(err)});
+    await BlackList.findOne({classCode:classCode})
+        .then(List=>{
+            if(!List){
+                const newBlack = new BlackList({classCode:classCode});
+                newBlack.save()
+                    .catch(err =>{ console.log(err)});
+            }
+        }).catch(err =>{ console.log(err)});
+    await BlackList.findOneAndUpdate({classCode:classCode},
+    {$push: { "BlackList": {
+                profID:blackList.profID,
+                contents:blackList.contents,
+                userID:userID,
+                userName:userName
+    }}}).then(res.send(true))
         .catch(err =>{ console.log(err)});
 })
 router.post('/:classCode/alarm',(req,res)=>{

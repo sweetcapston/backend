@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 // Load User model
-const {Class,User,Question,Survey,Answer_S,Quiz,Answer_Q}=require('../models');
+const {Class,User,Question,Survey,Answer_S,Quiz,Answer_Q,BlackList}=require('../models');
 
 const Relocate = (list1,list2,element) => {
     let list = [];
@@ -50,11 +50,21 @@ router.post('/', (req,res)=>{
 
 
 router.post('/enter', (req, res) => {
-    const {classCode} = req.body;
+    const {classCode,userID} = req.body;
+    let classInput;
+    // BlackList.find({classCode: classCode})
+    //     .then(List=>{
+    //         if(List) {
+    //             for(let i=0;i<List.BlackList.length;i++){
+    //                 if(List.BlackList[i].userID==userID)
+    //                     res.send(ture)
+    //             }
+    //         }
+    //     })
     Class.findOne({classCode: classCode})
     .then(thisClass => {
         if (thisClass) {
-            const classInput = {
+            classInput = {
                 className:thisClass.className,
                 profName:thisClass.profName
             };
