@@ -116,6 +116,7 @@ router.delete('/:classCode/delete', async(req, res) => {
 
 router.get('/:classCode/class',(req,res)=>{
     const {classCode} = req.params;
+
     Class.findOne({classCode:classCode})
         .then((Class)=>{
         res.send(Class)
@@ -127,8 +128,7 @@ router.put('/:classCode/alarm',(req,res)=>{
     const {classCode} = req.params;
     const {alarm} = req.body
     console.log(alarm)
-
-    Class.updateOne({ classCode: classCode }, { alarm : !alarm })
+    Class.updateOne({classCode:classCode}, { alarm : !alarm })
         .then((result) => {
             res.send(!alarm);
         })
@@ -148,6 +148,12 @@ router.put('/:classCode/classEdit',(req,res)=>{
         .catch(err => {
             console.log(err);
         })
+    User.updateMany({'classList.classCode':classCode},
+        {$set:{
+            "classList.$.className":className
+            }}).then(result=>{console.log(result)})
+        .catch(err=>{console.log(err)});
+
 })
 router.post('/:classCode/home',(req,res)=>{
     const {classCode} = req.params;
@@ -156,6 +162,7 @@ router.post('/:classCode/home',(req,res)=>{
     let moment = require("moment");
     moment.locale("ko");
     let now=moment().format("LLL");
+
     Question.find({classCode:classCode})
         .then(List => {
             if(List.length>0) {
