@@ -45,7 +45,6 @@ router.post('/', (req,res)=>{
         sessionCheck = true
     }
     res.send(sessionCheck);
-
     });
 
 
@@ -71,6 +70,7 @@ router.post('/enter', (req, res) => {
         }
     });
 });
+
 router.post('/:classCode/home',async(req,res)=>{
     const {classCode} = req.params;
     const {userID}=req.body;
@@ -81,9 +81,16 @@ router.post('/:classCode/home',async(req,res)=>{
     let quiz=0;
     let survey=0;
     let question=0;
+    let profEmail="";
     let moment = require("moment");
     moment.locale("ko");
     let now=moment().format("LLL");
+
+    Class.findOne({classCode:classCode})
+        .then(result=>{
+            if(result.length>0)
+                profEmail=result.profID;
+        })
 
     User.find({'classList.classCode':classCode})
         .then(result=>{student=result.length-1;})
@@ -140,10 +147,10 @@ router.post('/:classCode/home',async(req,res)=>{
                     }
                     newQuiz = Check(List, myAnswer_Q, "QID","quizName");
                 let data = {newQuestion:newQuestion,newSurvey:newSurvey,newQuiz:newQuiz
-                    ,student:student,question:question,survey:survey,quiz:quiz};
+                    ,student:student,question:question,survey:survey,quiz:quiz,profEmail:profEmail};
                 console.log(data);
                 res.send({newQuestion:newQuestion,newSurvey:newSurvey,newQuiz:newQuiz
-                    ,student:student,question:question,survey:survey,quiz:quiz});
+                    ,student:student,question:question,survey:survey,quiz:quiz,profEmail:profEmail});
             })
         })
         .catch(err=> {
