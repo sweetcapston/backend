@@ -69,11 +69,14 @@ passportConfig();
 router.post('/login',
     passport.authenticate('local'),
     function(req, res) {
+      console.log("3232");
       let Identity;
       if(req.user.studentId == "9999")
         Identity = 2;
       else 
         Identity = 1;
+      if(req.user.userID=="admin@email.com")
+        Identity = 3;
       res.send({
         Identity: Identity,
         userName: req.user.userName,
@@ -108,30 +111,26 @@ router.post('/passwordCheck',(req,res)=>{
 })
 
 router.put('/edit',(req,res)=>{
-  let {userID,userName,studentID} = req.body;
-  if(studentID=="")
-    studentID=9999;
-  User.findOneAndUpdate({userID:userID},{userName:userName,studentID:studentID})
-      .then(ID=>{
-        console.log(ID)
-        res.send(true)
-      }).catch(err=>console.log(err));
-})
-
-router.put('/editPassword',(req,res)=>{
-  let {userID,password} = req.body;
+  let {userID,userName,studentID,password} = req.body;
   let newPassword;
-  bcrypt.genSalt(10, (err, salt) => {
-    bcrypt.hash(password, salt, (err, hash) => {
-      if (err) throw err;
-      newPassword = hash;
-      User.findOneAndUpdate({userID:userID},{password:newPassword})
-          .then(ID=>{
-            console.log(ID)
-            res.send(true)
-          }).catch(err=>console.log(err));
-    });
-  });
+  if(password==null){
+    User.findOneAndUpdate({userID:userID},{userName:userName,studentID:studentID})
+        .then(ID=>{
+          console.log(ID)
+          res.send(true)
+        }).catch(err=>console.log(err));
+  }else{
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(password, salt, (err, hash) => {
+        if (err) throw err;
+        newPassword = hash;
+        User.findOneAndUpdate({userID:userID},{password:newPassword})
+            .then(ID=>{
+              console.log(ID)
+              res.send(true)
+            }).catch(err=>console.log(err));
+      });
+  })}
 })
 
 router.post('/withdraw',(req,res)=>{
