@@ -116,6 +116,7 @@ router.delete('/:classCode/delete', async(req, res) => {
 
 router.get('/:classCode/class',(req,res)=>{
     const {classCode} = req.params;
+
     Class.findOne({classCode:classCode})
         .then((Class)=>{
         res.send(Class)
@@ -127,8 +128,7 @@ router.put('/:classCode/alarm',(req,res)=>{
     const {classCode} = req.params;
     const {alarm} = req.body
     console.log(alarm)
-
-    Class.updateOne({ classCode: classCode }, { alarm : !alarm })
+    Class.updateOne({classCode:classCode}, { alarm : !alarm })
         .then((result) => {
             res.send(!alarm);
         })
@@ -136,7 +136,25 @@ router.put('/:classCode/alarm',(req,res)=>{
             console.log(err);
         })
 })
+router.put('/:classCode/classEdit',(req,res)=>{
+    const {classCode} = req.params;
+    const {className} = req.body
+    console.log(alarm)
 
+    Class.updateOne({ classCode: classCode }, { className : className })
+        .then((result) => {
+            res.send(result.className);
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    User.updateMany({'classList.classCode':classCode},
+        {$set:{
+            "classList.$.className":className
+            }}).then(result=>{console.log(result)})
+        .catch(err=>{console.log(err)});
+
+})
 router.post('/:classCode/home',(req,res)=>{
     const {classCode} = req.params;
     const {userID}=req.body;
@@ -144,6 +162,7 @@ router.post('/:classCode/home',(req,res)=>{
     let moment = require("moment");
     moment.locale("ko");
     let now=moment().format("LLL");
+
     Question.find({classCode:classCode})
         .then(List => {
             if(List.length>0) {
@@ -158,7 +177,7 @@ router.post('/:classCode/home',(req,res)=>{
                 console.log(now.substring(0,n))
                 for(let i=0;i<List.length;i++){
                     if(now.substring(0,n)==List[i].date.substring(0,n)
-                        &&List[i].userID!=userID) {
+                        &&List[i].userID!=userID&&newQuestion.length<3) {
                         newQuestion.push(List[i].question)
                     }
                 }

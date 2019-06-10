@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 // Load User model
-const {Class,User,Question,Survey,Answer_S,Quiz,Answer_Q,BlackList}=require('../models');
+const {Class,User,Question,Survey,Answer_S,Quiz,Answer_Q}=require('../models');
 
 const Relocate = (list1,list2,element) => {
     let list = [];
@@ -77,14 +77,23 @@ router.post('/:classCode/home',async(req,res)=>{
     let newQuestion=[];
     let newSurvey=[];
     let newQuiz=[];
+    let student=0;
+    let quiz=0;
+    let survey=0;
+    let question=0;
     let moment = require("moment");
     moment.locale("ko");
     let now=moment().format("LLL");
+
+    User.find({'classList.classCode':classCode})
+        .then(result=>{student=result.length-1;})
+        .catch(err=>{console.log(err)});
+
     await Question.find({classCode:classCode})
         .then(List => {
             if(List.length>0) {
                 let n=0;
-
+                question=List.length;
                 for(let i=0;i<now.length;i++){
                     if(now[i]=='오'){
                         n=i;
@@ -94,7 +103,7 @@ router.post('/:classCode/home',async(req,res)=>{
                 console.log(now.substring(0,n))
                 for(let i=0;i<List.length;i++){
                     if(now.substring(0,n)==List[i].date.substring(0,n)
-                        &&List[i].userID!=userID) {
+                        &&List[i].userID!=userID&&newQuestion.length<3) {
                         newQuestion.push(List[i].question)
                     }
                 }
@@ -105,6 +114,7 @@ router.post('/:classCode/home',async(req,res)=>{
         })
     await Survey.find({classCode: classCode})
         .then(List => {
+            survey=List.length;
             Answer_S.find({classCode: classCode ,userID: userID}).
             then(myAnswer_S=>{
                 for(let i=0;i<List.length;i++){
@@ -120,6 +130,7 @@ router.post('/:classCode/home',async(req,res)=>{
         })
     await Quiz.find({classCode: classCode})
         .then(List => {
+            quiz=List.length;
             Answer_Q.find({classCode: classCode ,userID: userID}).
             then(myAnswer_Q=>{
                     for(let i=0;i<List.length;i++){
@@ -128,9 +139,11 @@ router.post('/:classCode/home',async(req,res)=>{
                         }
                     }
                     newQuiz = Check(List, myAnswer_Q, "QID","quizName");
-                let data = {newQuestion:newQuestion,newSurvey:newSurvey,newQuiz:newQuiz};
+                let data = {newQuestion:newQuestion,newSurvey:newSurvey,newQuiz:newQuiz
+                    ,student:student,question:question,survey:survey,quiz:quiz};
                 console.log(data);
-                res.send({newQuestion:newQuestion,newSurvey:newSurvey,newQuiz:newQuiz});
+                res.send({newQuestion:newQuestion,newSurvey:newSurvey,newQuiz:newQuiz
+                    ,student:student,question:question,survey:survey,quiz:quiz});
             })
         })
         .catch(err=> {
