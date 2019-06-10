@@ -136,7 +136,19 @@ router.put('/:classCode/alarm',(req,res)=>{
             console.log(err);
         })
 })
+router.put('/:classCode/classEdit',(req,res)=>{
+    const {classCode} = req.params;
+    const {className} = req.body
+    console.log(alarm)
 
+    Class.updateOne({ classCode: classCode }, { className : className })
+        .then((result) => {
+            res.send(result.className);
+        })
+        .catch(err => {
+            console.log(err);
+        })
+})
 router.post('/:classCode/home',(req,res)=>{
     const {classCode} = req.params;
     const {userID}=req.body;
@@ -158,7 +170,7 @@ router.post('/:classCode/home',(req,res)=>{
                 console.log(now.substring(0,n))
                 for(let i=0;i<List.length;i++){
                     if(now.substring(0,n)==List[i].date.substring(0,n)
-                        &&List[i].userID!=userID) {
+                        &&List[i].userID!=userID&&newQuestion.length<3) {
                         newQuestion.push(List[i].question)
                     }
                 }

@@ -91,19 +91,55 @@ router.get('/logout', (req, res) => {
   res.send("logout");
 });
 
-router.post('/withdraw',(req,res)=>{
-  const {userID,password} =req.body;
+router.post('/passwordCheck',(req,res)=>{
+  const { userID,password } = req.body;
   User.findOne({userID:userID}).then(ID=>{
     if(ID){
       bcrypt.compare(password, ID.password, (err, isMatch) => {
         if (err) throw err;
         if (isMatch) {
-          ID.remove();
           res.send(true);
         } else {
           res.send(false)
         }
       })
+    }else{res.send(false)}
+  })
+})
+
+router.put('/edit',(req,res)=>{
+  let {userID,userName,studentID} = req.body;
+  if(studentID=="")
+    studentID=9999;
+  User.findOneAndUpdate({userID:userID},{userName:userName,studentID:studentID})
+      .then(ID=>{
+        console.log(ID)
+        res.send(true)
+      }).catch(err=>console.log(err));
+})
+
+router.put('/editPassword',(req,res)=>{
+  let {userID,password} = req.body;
+  let newPassword;
+  bcrypt.genSalt(10, (err, salt) => {
+    bcrypt.hash(password, salt, (err, hash) => {
+      if (err) throw err;
+      newPassword = hash;
+      User.findOneAndUpdate({userID:userID},{password:newPassword})
+          .then(ID=>{
+            console.log(ID)
+            res.send(true)
+          }).catch(err=>console.log(err));
+    });
+  });
+})
+
+router.post('/withdraw',(req,res)=>{
+  const {userID} =req.body;
+  User.findOne({userID:userID}).then(ID=>{
+    if(ID){
+          ID.remove();
+          re.send(true);
     }else{res.send(false)}
   })
 })

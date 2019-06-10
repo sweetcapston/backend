@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 // Load User model
-const {Class,User,Question,Survey,Answer_S,Quiz,Answer_Q,BlackList}=require('../models');
+const {Class,User,Question,Survey,Answer_S,Quiz,Answer_Q}=require('../models');
 
 const Relocate = (list1,list2,element) => {
     let list = [];
@@ -94,7 +94,7 @@ router.post('/:classCode/home',async(req,res)=>{
                 console.log(now.substring(0,n))
                 for(let i=0;i<List.length;i++){
                     if(now.substring(0,n)==List[i].date.substring(0,n)
-                        &&List[i].userID!=userID) {
+                        &&List[i].userID!=userID&&newQuestion.length<3) {
                         newQuestion.push(List[i].question)
                     }
                 }
