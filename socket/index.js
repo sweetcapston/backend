@@ -1,5 +1,5 @@
 const app = require('../app');
-const {Question,Survey,Answer_S,Quiz,Answer_Q}=require('../models');
+const {Class, Question,Survey,Answer_S,Quiz,Answer_Q, BlackList}=require('../models');
 // const IOserver = require('../app');
 // const io = require('socket.io')(IOserver);
 const server = app.listen(3000, function () {
@@ -53,6 +53,48 @@ questionIO.on('connect', (socket) => {
         .catch(err=> {
             console.log(err)
         })
+    })
+    socket.on("black", async(data) => {
+        const blacklist = data.BlackList
+        const {classCode, QesID} = data
+        
+        await Question.findOne({QesID : QesID })
+        .then(result => {
+            if(result){
+                result.remove()
+                questionIO.to(socket.user.classCode).emit("delete", result)
+            }
+        })
+        .catch(err=> {
+            console.log(err)
+        })
+
+        await Class.updateOne(
+            { classCode: classCode },
+            { $push: {BlackList: {
+                userID:blacklist.userID,
+                userName:blacklist.userName
+            }}})
+        .then().catch(err =>{ console.log(err)});
+
+        await BlackList.findOne({classCode:classCode})
+        .then(List=>{
+            if(!List){
+                const newBlack = new BlackList({classCode:classCode});
+                newBlack.save().then(result => {
+                    BlackList.findOneAndUpdate({classCode:classCode},
+                    {$push: { "BlackList": blacklist}})
+                    .then()
+                    .catch(err =>{ console.log(err)});
+                })
+                    .catch(err =>{ console.log(err)});
+            }else{
+                BlackList.findOneAndUpdate({classCode:classCode},
+                {$push: { "BlackList": blacklist}})
+                .then()
+                .catch(err =>{ console.log(err)});
+            }
+        }).catch(err =>{ console.log(err)});
     })
     socket.on("edit", (data) => {
         let {QesID, question, anonymous}=data
