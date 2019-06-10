@@ -139,7 +139,6 @@ router.put('/:classCode/alarm',(req,res)=>{
 router.put('/:classCode/classEdit',(req,res)=>{
     const {classCode} = req.params;
     const {className} = req.body
-    console.log(alarm)
 
     Class.updateOne({ classCode: classCode }, { className : className })
         .then((result) => {
