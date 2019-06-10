@@ -350,7 +350,7 @@ router.post('/:classCode/statistics/quiz', async(req,res)=>{
         { $sort: { count: -1 } }
     ])
         .then(List => {
-            if (List.length>0) {
+            if (List.length > 0) {
                 let student = List.length;
                 let top = 0;
                 max = List[0].count;
