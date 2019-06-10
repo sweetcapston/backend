@@ -91,6 +91,23 @@ router.get('/logout', (req, res) => {
   res.send("logout");
 });
 
+router.post('/withdraw',(req,res)=>{
+  const {userID,password} =req.body;
+  User.findOne({userID:userID}).then(ID=>{
+    if(ID){
+      bcrypt.compare(password, ID.password, (err, isMatch) => {
+        if (err) throw err;
+        if (isMatch) {
+          ID.remove();
+          res.send(true);
+        } else {
+          res.send(false)
+        }
+      })
+    }else{res.send(false)}
+  })
+})
+
 //autologin
 router.get('/', (req,res)=>{
   let sessionCheck = false;

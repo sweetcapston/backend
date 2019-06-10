@@ -52,18 +52,14 @@ router.post('/', (req,res)=>{
 router.post('/enter', (req, res) => {
     const {classCode,userID} = req.body;
     let classInput;
-    // BlackList.find({classCode: classCode})
-    //     .then(List=>{
-    //         if(List) {
-    //             for(let i=0;i<List.BlackList.length;i++){
-    //                 if(List.BlackList[i].userID==userID)
-    //                     res.send(ture)
-    //             }
-    //         }
-    //     })
     Class.findOne({classCode: classCode})
     .then(thisClass => {
         if (thisClass) {
+            thisClass.BlackList.forEach(user => {
+                if (user.userID == userID&&user.state==true){
+                    res.send("black")
+                    return true;}
+                    })
             classInput = {
                 className:thisClass.className,
                 profName:thisClass.profName
@@ -331,7 +327,7 @@ router.post("/:classCode/statistics", (req, res) => {
         { $sort: { count: -1 } }
     ])
         .then(List => {
-            if (List) {
+            if (List.length>0) {
                 let professor = -1;
                 let student = List.length;
                 let top = 0;
@@ -405,7 +401,7 @@ router.post("/:classCode/statistics/quiz", async (req, res) => {
         { $sort: { count: -1 } }
     ])
         .then(List => {
-            if (List) {
+            if (List.length>0) {
                 let student = List.length;
                 let top = 0;
                 max = List[0].count;

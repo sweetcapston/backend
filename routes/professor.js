@@ -113,9 +113,21 @@ router.delete('/:classCode/delete', async(req, res) => {
             console.log(err);
         })
 });
-router.post('/:classCode/alarm',(req,res)=>{
+
+router.get('/:classCode/class',(req,res)=>{
+    const {classCode} = req.params;
+    Class.findOne({classCode:classCode})
+        .then((Class)=>{
+        res.send(Class)
+    })
+        .catch(err =>{ console.log(err)});
+})
+
+router.put('/:classCode/alarm',(req,res)=>{
     const {classCode} = req.params;
     const {alarm} = req.body
+    console.log(alarm)
+
     Class.updateOne({ classCode: classCode }, { alarm : !alarm })
         .then((result) => {
             res.send(!alarm);
@@ -271,7 +283,7 @@ router.post('/:classCode/statistics',(req,res)=>{
         {'$sort':{'count':-1}},
     ])
         .then(List => {
-            if(List){
+            if(List.length>0){
                 let professor=-1
                 let student=List.length
                 let top=0
@@ -338,7 +350,7 @@ router.post('/:classCode/statistics/quiz', async(req,res)=>{
         { $sort: { count: -1 } }
     ])
         .then(List => {
-            if (List) {
+            if (List.length>0) {
                 let student = List.length;
                 let top = 0;
                 max = List[0].count;

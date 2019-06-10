@@ -74,9 +74,12 @@ describe('# Professor test', function () {
             .send({survey:survey})
             .end((err, res) => {
                 expect(err).to.be.null;
-                expect(res.body).to.equal(true);
+                expect(res.body).to.be.an("Object");
                 done();
             })
         });
     });
+    //설문 수정
+    //설문 삭제
+
 })
