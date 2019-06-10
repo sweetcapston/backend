@@ -93,14 +93,12 @@ router.delete('/:classCode/delete', async(req, res) => {
         })
     await Answer_S.deleteMany({classCode: classCode})
         .then(List => {
-            res.send(true);
         })
         .catch(err=> {
             console.log(err);
         })
     await Quiz.deleteMany({classCode: classCode})
         .then(List => {
-            res.send(true);
         })
         .catch(err=> {
             console.log(err);

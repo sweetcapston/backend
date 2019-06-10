@@ -110,24 +110,22 @@ router.post('/passwordCheck',(req,res)=>{
   })
 })
 
-router.put('/edit',(req,res)=>{
-  let {userID,userName,studentID,password} = req.body;
+router.post('/edit',(req,res)=>{
+  let {userID, userName, studentID, password} = req.body;
   let newPassword;
-  if(password==null){
+  if(password==""){
     User.findOneAndUpdate({userID:userID},{userName:userName,studentID:studentID})
         .then(ID=>{
-          console.log(ID)
-          res.send(true)
+          res.send({userName:userName, studentID:studentID})
         }).catch(err=>console.log(err));
   }else{
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(password, salt, (err, hash) => {
         if (err) throw err;
         newPassword = hash;
-        User.findOneAndUpdate({userID:userID},{password:newPassword})
+        User.findOneAndUpdate({userID:userID}, {password:newPassword, userName:userName, studentID:studentID})
             .then(ID=>{
-              console.log(ID)
-              res.send(true)
+              res.send({userName:userName, studentID:studentID})
             }).catch(err=>console.log(err));
       });
   })}
