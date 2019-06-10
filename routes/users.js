@@ -113,6 +113,22 @@ router.post('/passwordCheck',(req,res)=>{
 router.post('/edit',(req,res)=>{
   let {userID, userName, studentID, password} = req.body;
   let newPassword;
+  if(studentID=="9999"){
+    User.findOne({userID:userID})
+        .then(ID=>{
+          if(ID.userName!=userName){
+            Class.updateMany({ profName: ID.userName }, { profName : userName })
+                .catch(err => {
+                  console.log(err);
+                })
+            User.updateMany({'classList.profName':ID.userName},
+                {$set:{
+                    "classList.$.profName": userName
+                  }})
+                .catch(err=>{console.log(err)});
+          }
+        })
+  }
   if(password==""){
     User.findOneAndUpdate({userID:userID},{userName:userName,studentID:studentID})
         .then(ID=>{
