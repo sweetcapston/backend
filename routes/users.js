@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const passport = require('passport');
 const passportConfig= require('../config/passport');
 // Load User model
-const {Class,User}=require('../models');
+const {Class,User,BlackList,Survey,Question,Quiz,Answer_Q,Answer_S}=require('../models');
 
 
 // Login Page
@@ -110,28 +110,44 @@ router.post('/passwordCheck',(req,res)=>{
   })
 })
 
-router.post('/edit',(req,res)=>{
-  let {userID, userName, studentID, password} = req.body;
+router.post('/edit', async (req,res)=>{
+  let {userID, originName ,userName, studentID, password} = req.body;
   let newPassword;
+  console.log(studentID);
   if(studentID=="9999"){
     User.findOne({userID:userID})
         .then(ID=>{
-          if(ID.userName!=userName){
-            Class.updateMany({ profName: ID.userName }, { profName : userName })
+            console.log("userName"+userName);
+            console.log("originName"+originName);
+          if(originName!=userName){
+            Class.updateMany({ profID: userID }, { profName : userName })
+                .then(result=>{
+                    console.log(result);
+                })
                 .catch(err => {
                   console.log(err);
                 })
-            User.updateMany({'classList.profName':ID.userName},
-                {$set:{
-                    "classList.$.profName": userName
-                  }})
-                .catch(err=>{console.log(err)});
+              for(let i=0;i<ID.classList.length;i++) {
+                  User.updateMany({'classList.profName': originName},
+                      {
+                          $set: {
+                              "classList.$.profName": userName
+                          }
+                      })
+                      .then(result => {
+                          console.log(result);
+                      })
+                      .catch(err => {
+                          console.log(err)
+                      });
+              }
           }
         })
   }
   if(password==""){
     User.findOneAndUpdate({userID:userID},{userName:userName,studentID:studentID})
         .then(ID=>{
+            console.log("아이디나 학번 바꾼다잉");
           res.send({userName:userName, studentID:studentID})
         }).catch(err=>console.log(err));
   }else{
@@ -149,10 +165,74 @@ router.post('/edit',(req,res)=>{
 
 router.post('/withdraw',(req,res)=>{
   const {userID} =req.body;
+  let classCodeList =[]
   User.findOne({userID:userID}).then(ID=>{
     if(ID){
-          ID.remove();
-          re.send(true);
+            if(ID.studentID=="9999"){
+                for(let i=0;i<ID.classList;i++) {
+                    classCodeList.push(ID.classList.classCode)
+                }
+                for(let i=0;i<classCodeList.length;i++){
+                    classCode=classCodeList[i];
+                    Class.findOne({classCode: classCode})
+                        .then(thisclass => {
+                            if (thisclass) {
+                                thisclass.remove();
+                            }
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                    Question.deleteMany({classCode: classCode})
+                        .catch(err => {
+                            console.log(err);
+                        })
+                    Survey.deleteMany({classCode: classCode})
+                        .catch(err => {
+                            console.log(err);
+                        })
+                    Answer_S.deleteMany({classCode: classCode})
+                        .catch(err => {
+                            console.log(err);
+                        })
+                    Quiz.deleteMany({classCode: classCode})
+                        .catch(err => {
+                            console.log(err);
+                        })
+                    Answer_Q.deleteMany({classCode: classCode})
+                        .catch(err => {
+                            console.log(err);
+                        })
+                    BlackList.deleteMany({classCode: classCode})
+                        .catch(err => {
+                            console.log(err);
+                        })
+                    ID.remove();
+                    res.log(ID+"탈퇴")
+                    res.send(true)
+                }
+            }
+            else{
+                Question.deleteMany({userID: userID})
+                    .catch(err => {
+                        console.log(err);
+                    })
+                Answer_S.deleteMany({userID: userID})
+                    .catch(err => {
+                        console.log(err);
+                    })
+                Answer_Q.deleteMany({userID: userID})
+                    .catch(err => {
+                        console.log(err);
+                    })
+                BlackList.deleteMany({userID: userID})
+                    .catch(err => {
+                        console.log(err);
+                    })
+                ID.remove();
+                res.log(ID+"탈퇴")
+                res.send(true)
+            }
     }else{res.send(false)}
   })
 })

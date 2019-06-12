@@ -105,6 +105,12 @@ router.delete('/:classCode/delete', async(req, res) => {
         })
     await Answer_Q.deleteMany({classCode: classCode})
         .then(List => {
+        })
+        .catch(err=> {
+            console.log(err);
+        })
+    await BlackList.deleteMany({classCode: classCode})
+        .then(List => {
             res.send(true);
         })
         .catch(err=> {
@@ -150,8 +156,8 @@ router.put('/:classCode/classEdit',(req,res)=>{
             "classList.$.className":className
             }}).then(result=>{console.log(result)})
         .catch(err=>{console.log(err)});
-
 })
+
 router.post('/:classCode/home',(req,res)=>{
     const {classCode} = req.params;
     const {userID}=req.body;
