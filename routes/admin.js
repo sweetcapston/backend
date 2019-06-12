@@ -31,8 +31,10 @@ router.post('/userBlock', async(req,res)=>{
 })
 
 router.post('/userRelease', async (req,res)=>{
-    const {userID} = req.body.userID;
-    const {classCode} = req.body.classCode;
+    
+    const {userID, classCode} = req.body;
+    console.log(userID);
+    console.log(classCode);
     await BlackList.updateOne({classCode:classCode,'BlackList.userID': userID},
         {
             $set: {
