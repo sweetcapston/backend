@@ -57,6 +57,8 @@ questionIO.on('connect', (socket) => {
     socket.on("black", async(data) => {
         const blacklist = data.BlackList
         const {classCode, QesID} = data
+        console.log(blacklist);
+        console.log('here')
         
         await Question.findOne({QesID : QesID })
         .then(result => {
@@ -72,8 +74,10 @@ questionIO.on('connect', (socket) => {
         await Class.updateOne(
             { classCode: classCode },
             { $push: {BlackList: {
+                profID:blacklist.profID,
                 userID:blacklist.userID,
-                userName:blacklist.userName
+                userName:blacklist.userName,
+                state: false
             }}})
         .then().catch(err =>{ console.log(err)});
 
