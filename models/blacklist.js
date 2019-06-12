@@ -8,7 +8,8 @@ const BlackListSchema = new mongoose.Schema({
       contents: { type:String, required:true },
       userID: { type:String, required:true },
       userName: { type:String, required:true },
-      reason: {type:String, required:true}
+      reason: {type:String, required:true},
+      state: {type:Boolean, required:true}
         }, { _id: false }
     )]
 });

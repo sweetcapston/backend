@@ -71,7 +71,7 @@ app.use(function(req, res, next) {
 });
 
 //HTTP 접근 제어(cor) 처리
-app.use(cors({origins: ["http://localhost:8080", "http://www.openclass.cf", "http://openclass.cf", "https://www.openclass.cf", "https://openclass.cf"]}));
+app.use(cors({origins: ["http://localhost:8080", "http://www.openclass.gq", "http://openclass.gq", "https://www.openclass.gq", "https://openclass.gq"]}));
 
 // Routes
 app.use('/', require('./routes/index.js'));

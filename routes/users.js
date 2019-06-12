@@ -147,7 +147,6 @@ router.post('/edit', async (req,res)=>{
   if(password==""){
     User.findOneAndUpdate({userID:userID},{userName:userName,studentID:studentID})
         .then(ID=>{
-            console.log("아이디나 학번 바꾼다잉");
           res.send({userName:userName, studentID:studentID})
         }).catch(err=>console.log(err));
   }else{
