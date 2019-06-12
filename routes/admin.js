@@ -33,13 +33,13 @@ router.get('/admin/userRelease', async (req,res)=>{
     await BlackList.updateOne({classCode:classCode,'BlackList.userID': userID},
         {
             $set: {
-                "BlackList.$.state": true
+                "BlackList.$.state": false
             }
         }).catch(err=>console.log(err));
     await Class.updateOne({classCode:classCode,'BlackList.userID': userID},
         {
             $set: {
-                "BlackList.$.state": true
+                "BlackList.$.state": false
             }
         }).then(result=>res.send(true))
         .catch(err=>console.log(err));
