@@ -69,13 +69,25 @@ questionIO.on('connect', (socket) => {
             console.log(err)
         })
 
-        await Class.updateOne(
-            { classCode: classCode },
-            { $push: {BlackList: {
-                userID:blacklist.userID,
-                userName:blacklist.userName
-            }}})
-        .then().catch(err =>{ console.log(err)});
+        await Class.findOne({classCode:classCode,'BlackList.userID':blacklist.userID})
+            .then(user=>{
+                if(!user){
+                    Class.updateOne(
+                    { classCode: classCode },
+                    { $push: {BlackList: {
+                                userID:blacklist.userID,
+                                userName:blacklist.userName,
+                                state:false
+                            }}})
+                    .then().catch(err =>{ console.log(err)});
+
+                    BlackList.findOneAndUpdate({classCode:classCode},
+                        {$push: { "BlackList": blacklist}})
+                        .then()
+                        .catch(err =>{ console.log(err)});
+                }
+        })
+            .catch(err=>{console.log(err)});
 
         await BlackList.findOne({classCode:classCode})
         .then(List=>{
@@ -87,15 +99,10 @@ questionIO.on('connect', (socket) => {
                     .then()
                     .catch(err =>{ console.log(err)});
                 })
-                    .catch(err =>{ console.log(err)});
-            }else{
-                BlackList.findOneAndUpdate({classCode:classCode},
-                {$push: { "BlackList": blacklist}})
-                .then()
-                .catch(err =>{ console.log(err)});
             }
         }).catch(err =>{ console.log(err)});
     })
+
     socket.on("edit", (data) => {
         let {QesID, question, anonymous}=data
         Question.updateOne({QesID:QesID},{question:question, anonymous: anonymous})

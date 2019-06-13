@@ -20,7 +20,7 @@ const Relocate = (list1,list2,element) => {
     }
     return list
 }
-const Check = (list1,list2,element,name) => {
+const Check = (list1,list2,element,name,active) => {
     let list = [];
     let val;
     for(let i=0;i<list1.length;i++){
@@ -31,7 +31,7 @@ const Check = (list1,list2,element,name) => {
                 break;
             }
         }
-        if(val==0)
+        if(val==0&&list1[i][`${active}`]==true)
             list.push({Name : list1[i][`${name}`]});
     }
     return list
@@ -128,7 +128,7 @@ router.post('/:classCode/home',async(req,res)=>{
                         List.splice(i,1);
                     }
                 }
-                    newSurvey = Check(List, myAnswer_S, "SID","surveyName");
+                    newSurvey = Check(List, myAnswer_S, "SID","surveyName","active");
             })
         })
         .catch(err=> {
@@ -144,7 +144,7 @@ router.post('/:classCode/home',async(req,res)=>{
                             List.splice(i,1);
                         }
                     }
-                    newQuiz = Check(List, myAnswer_Q, "QID","quizName");
+                    newQuiz = Check(List, myAnswer_Q, "QID","quizName","active");
                 let data = {newQuestion:newQuestion,newSurvey:newSurvey,newQuiz:newQuiz
                     ,student:student,question:question,survey:survey,quiz:quiz,profEmail:profEmail};
                 console.log(data);
