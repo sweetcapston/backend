@@ -5,7 +5,7 @@ const Question = require('./question');
 const Quiz = require('./quiz');
 const Survey = require('./survey');
 const User = require('./user');
-const Blacklist = require('./blacklist');
+const BlackList = require('./blacklist');
 
 module.exports = {
     Answer_Q, 
@@ -15,5 +15,6 @@ module.exports = {
     Quiz, 
     Survey, 
     User, 
-    Blacklist
+    BlackList
 }
+

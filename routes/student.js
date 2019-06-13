@@ -20,6 +20,22 @@ const Relocate = (list1,list2,element) => {
     }
     return list
 }
+const Check = (list1,list2,element,name,active) => {
+    let list = [];
+    let val;
+    for(let i=0;i<list1.length;i++){
+        val=0;
+        for(let j=0;j<list2.length;j++){
+            if(list1[i][`${element}`]==list2[j][`${element}`]){
+                val=1;
+                break;
+            }
+        }
+        if(val==0&&list1[i][`${active}`]==true)
+            list.push({Name : list1[i][`${name}`]});
+    }
+    return list
+}
 
 
 router.post('/', (req,res)=>{
@@ -28,16 +44,21 @@ router.post('/', (req,res)=>{
         sessionCheck = true
     }
     res.send(sessionCheck);
-
     });
 
 
 router.post('/enter', (req, res) => {
-    const {classCode} = req.body;
+    const {classCode,userID} = req.body;
+    let classInput;
     Class.findOne({classCode: classCode})
     .then(thisClass => {
         if (thisClass) {
-            const classInput = {
+            thisClass.BlackList.forEach(user => {
+                if (user.userID == userID&&user.state==true){
+                    res.send("black")
+                    return true;}
+                    })
+            classInput = {
                 className:thisClass.className,
                 profName:thisClass.profName
             };
@@ -48,6 +69,93 @@ router.post('/enter', (req, res) => {
         }
     });
 });
+
+router.post('/:classCode/home',async(req,res)=>{
+    const {classCode} = req.params;
+    const {userID}=req.body;
+    let newQuestion=[];
+    let newSurvey=[];
+    let newQuiz=[];
+    let student=0;
+    let quiz=0;
+    let survey=0;
+    let question=0;
+    let profEmail="";
+    let moment = require("moment");
+    moment.locale("ko");
+    let now=moment().format("LLL");
+
+    Class.findOne({classCode:classCode})
+        .then(result=>{
+            if(result.length>0)
+                profEmail=result.profID;
+        })
+
+    User.find({'classList.classCode':classCode})
+        .then(result=>{student=result.length-1;})
+        .catch(err=>{console.log(err)});
+
+    await Question.find({classCode:classCode})
+        .then(List => {
+            if(List.length>0) {
+                let n=0;
+                question=List.length;
+                for(let i=0;i<now.length;i++){
+                    if(now[i]=='오'){
+                        n=i;
+                        break;
+                    }
+                }
+                console.log(now.substring(0,n))
+                for(let i=0;i<List.length;i++){
+                    if(now.substring(0,n)==List[i].date.substring(0,n)
+                        &&List[i].userID!=userID&&newQuestion.length<3) {
+                        newQuestion.push(List[i].question)
+                    }
+                }
+            }
+        })
+        .catch(err=> {
+            console.log(err);
+        })
+    await Survey.find({classCode: classCode})
+        .then(List => {
+            survey=List.length;
+            Answer_S.find({classCode: classCode ,userID: userID}).
+            then(myAnswer_S=>{
+                for(let i=0;i<List.length;i++){
+                    if(List[i].active==false){
+                        List.splice(i,1);
+                    }
+                }
+                    newSurvey = Check(List, myAnswer_S, "SID","surveyName","active");
+            })
+        })
+        .catch(err=> {
+            console.log(err);
+        })
+    await Quiz.find({classCode: classCode})
+        .then(List => {
+            quiz=List.length;
+            Answer_Q.find({classCode: classCode ,userID: userID}).
+            then(myAnswer_Q=>{
+                    for(let i=0;i<List.length;i++){
+                        if(List[i].active==false){
+                            List.splice(i,1);
+                        }
+                    }
+                    newQuiz = Check(List, myAnswer_Q, "QID","quizName","active");
+                let data = {newQuestion:newQuestion,newSurvey:newSurvey,newQuiz:newQuiz
+                    ,student:student,question:question,survey:survey,quiz:quiz,profEmail:profEmail};
+                console.log(data);
+                res.send({newQuestion:newQuestion,newSurvey:newSurvey,newQuiz:newQuiz
+                    ,student:student,question:question,survey:survey,quiz:quiz,profEmail:profEmail});
+            })
+        })
+        .catch(err=> {
+            console.log(err);
+        })
+})
 
 router.get('/:classCode/classAdd', (req, res) => {
     const {classCode} = req.params
@@ -71,12 +179,12 @@ router.get('/:classCode/classAdd', (req, res) => {
                 res.send(false);
             }
         }).catch(err => {
-        res.send(err);
+        console.log(err);
     });
 });
 
 router.delete('/:classCode/delete', (req, res) => {
-    const {classCode} = req.params
+    const {classCode} = req.params;
     User.findByIdAndUpdate(
         req.user._id,
         {$pull: { "classList": {
@@ -86,7 +194,7 @@ router.delete('/:classCode/delete', (req, res) => {
         res.send(true)
     })
     .catch(err=> {
-        res.send(err);
+        console.log(err);
     })
 });
 
@@ -97,8 +205,22 @@ router.post('/:classCode/question',(req,res)=>{
                 res.send({questionList: List})
             })
             .catch(err=> {
-                res.send(err);
+                console.log(err);
             })
+});
+
+router.delete('/:classCode/questionDelete',(req,res)=>{
+    let {classCode}=req.params;
+    let {QesID}=req.body
+    Question.findOne({QesID : QesID })
+        .then(result => {
+            if(result)
+            {result.remove()}
+            res.send(true)
+        })
+        .catch(err=> {
+            console.log(err);
+        })
 });
 
 router.post('/:classCode/survey',(req,res)=>{
@@ -120,7 +242,7 @@ router.post('/:classCode/survey',(req,res)=>{
             })
         })
         .catch(err=> {
-            res.send(err);
+            console.log(err);
         })
 });
 
@@ -130,21 +252,23 @@ router.post('/:classCode/surveyAnswer_S',(req,res)=>{
     newAnswer_S.save();
     Survey.findOne({ SID: answer_S.SID })
         .then(thisSurvey => {
-            for (let i = 0; i < answer_S.surveyType.length; i++) {
-                if (Number(answer_S.surveyType[i]) < 3) {
-                    let check = parseInt(answer_S.answer[i]);
-                    while (check >= 1) {
-                        thisSurvey.surveyList[i].count[check % 10 - 1]++;
-                        check = parseInt(check / 10)
+            if(thisSurvey) {
+                for (let i = 0; i < answer_S.surveyType.length; i++) {
+                    if (Number(answer_S.surveyType[i]) < 3) {
+                        let check = parseInt(answer_S.answer[i]);
+                        while (check >= 1) {
+                            thisSurvey.surveyList[i].count[check % 10 - 1]++;
+                            check = parseInt(check / 10)
+                        }
+                    } else {
+                        thisSurvey.surveyList[i].content.push(answer_S.answer[i]);
                     }
-                } else{
-                    thisSurvey.surveyList[i].content.push(answer_S.answer[i]);
                 }
+                Survey.updateOne({SID: answer_S.SID}, {surveyList: thisSurvey.surveyList})
+                    .then(result => {
+                        res.send(true);
+                    })
             }
-            Survey.updateOne({ SID: answer_S.SID }, { surveyList: thisSurvey.surveyList })
-                .then(result => {
-                    res.send(true);
-                })
         })
 })
 
@@ -159,7 +283,6 @@ router.post('/:classCode/quiz',(req,res)=>{
                 let list;
                 if(myAnswer_Q.length>0) {
                     list = Relocate(List, myAnswer_Q, "QID");
-                    res.send({quizList: List, myAnswer_Q: list});
                 }
                 else{
                     list = new Array(List.length).fill({None : 0})
@@ -168,20 +291,21 @@ router.post('/:classCode/quiz',(req,res)=>{
             })
         })
         .catch(err=> {
-            res.send(err);
+            console.log(err);
         })
 });
 
-router.post('/:classCode/quizAnswer_S',(req,res)=>{
+router.post('/:classCode/quizAnswer_Q',(req,res)=>{
     let { answer_Q } = req.body;
     let score = 0;
-    Quiz.findOne({ QID: answer_Q.SID })
+    Quiz.findOne({ QID: answer_Q.QID })
         .then(thisQuiz => {
             for (let i = 0; i < answer_Q.quizType.length; i++) {
+                if(thisQuiz.quizList[i].correct==answer_Q.answer[i]){
+                    score=score+thisQuiz.quizList[i].point;
+                    thisQuiz.quizList[i].correctNumber=thisQuiz.quizList[i].correctNumber+1;
+                }
                 if (Number(answer_Q.quizType[i]) < 3) {
-                    if(thisQuiz.quizList[i].correct==answer_Q.answer[i]){
-                        score=score+thisQuiz.quizList[i].point;
-                    }
                     let check = parseInt(answer_Q.answer[i]);
                     while (check >= 1) {
                         thisQuiz.quizList[i].count[check % 10 - 1]++;
@@ -201,5 +325,136 @@ router.post('/:classCode/quizAnswer_S',(req,res)=>{
                 })
         })
 })
+router.post("/:classCode/statistics", (req, res) => {
+    let { classCode } = req.params;
+    let { studentID } = req.body;
+    let avg = 0;
+    let max = 0;
+    let mid = 0;
+    let top5 = 0;
+    let user = 0;
+    let data = {};
+
+    Question.aggregate([
+        { $match: { classCode: classCode } },
+        {
+            $group: {
+                _id: "$studentID",
+                count: { $sum: 1 }
+            }
+        },
+        { $sort: { count: -1 } }
+    ])
+        .then(List => {
+            if (List.length>0) {
+                let professor = -1;
+                let student = List.length;
+                let top = 0;
+
+                max = List[0].count;
+                mid = List[parseInt(List.length / 2)].count;
+
+                for (let i = 0; i < List.length; i++) {
+                    if (List[i]._id == "9999") {
+                        professor = i;
+                    } else {
+                        if (List[i]._id == studentID) {
+                            user = List[i].count;
+                        }
+                        if (i < 5) {
+                            top5 = (top5 * top + List[i].count) / (top + 1);
+                            top++;
+                        }
+                        if (i == 5 && professor > 0) {
+                            top5 = (top5 * top + List[i].count) / (top + 1);
+                            top++;
+                        }
+                        avg = avg + List[i].count;
+                    }
+                }
+                if (professor != -1) {
+                    List.splice(professor, 1);
+                    --student;
+                }
+                avg = avg / student;
+                data = {
+                    top5: parseInt(top5),
+                    user: user,
+                    avg: parseInt(avg),
+                    max: max,
+                    mid: mid
+                };
+                res.send({ data: data });
+            }
+        })
+        .catch(err => {
+            console.log(err);
+        });
+});
+router.post("/:classCode/statistics/quiz", async (req, res) => {
+    let { classCode } = req.params;
+    let { QID } = req.body;
+    let avg = 0;
+    let max = 0;
+    let mid = 0;
+    let min = 0;
+    let top5 = 0;
+    let data = {};
+    let correctRate=[];
+    await Quiz.findOne({QID:QID})
+        .then(List=>{
+            if(List) {
+                for (let i = 0; i < List.quizList.length; i++) {
+                    correctRate.push(List.quizList[i].correctNumber);
+                }
+            }
+        })
+    await Answer_Q.aggregate([
+        { $match: { QID: QID } },
+        {
+            $group: {
+                _id: "$studentID",
+                count: { $sum: "$score" }
+            }
+        },
+        { $sort: { count: -1 } }
+    ])
+        .then(List => {
+            if (List.length>0) {
+                let student = List.length;
+                let top = 0;
+                max = List[0].count;
+                for(let i=0;i<correctRate.length;i++){
+                    correctRate[i]=parseInt(correctRate[i]/student*100);
+                }
+                if (parseInt(List.length / 2) > 1) {
+                    min = List[parseInt(List.length / 2) - 1].count;
+                }
+                mid = List[parseInt(List.length / 2)].count;
+                for (let i = 0; i < List.length; i++) {
+                    if (i < 5) {
+                        top5 = top5 + List[i].count;
+                        top++;
+                    }
+                    avg = avg + List[i].count;
+                }
+                avg = avg / student;
+                top5 = top5 / top;
+                data = {
+                    top5: top5.toFixed(1),
+                    avg: avg.toFixed(1),
+                    max: max,
+                    min: min,
+                    mid: mid,
+                };
+                console.log(data);
+                console.log(correctRate);
+                res.send({ data: data, correctRate: correctRate });
+            }
+        })
+        .catch(err => {
+            console.log(err);
+        });
+});
 
 module.exports = router;

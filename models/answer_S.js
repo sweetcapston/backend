@@ -4,9 +4,10 @@ const Answer_SSchema = new mongoose.Schema({
   classCode: { type: String, required: true }, 
   userID: { type: String, required: true },
   userName:{type: String, required: true },
+  studentID:{type: String,required: true},
   SID: { type: Number, required: true },
   answer: [{ type: String }],
-  Type:[{type: Number}],
+  surveyType:[{type: Number}],
 });
 
 const Answer_S = mongoose.model('Answer_S', Answer_SSchema);

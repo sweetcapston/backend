@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 // Load User model
-const {Class,User,Question,Survey,Answer_S,Quiz,Answer_Q}=require('../models');
+const {Class,User,Question,Survey,Answer_S,Quiz,Answer_Q,BlackList}=require('../models');
 
 //6자리 난수 코드 생성
 const CreateRandomCode = () => {
@@ -32,7 +32,7 @@ router.post('/classCreate', async (req, res) => {
     await newClass.save()
         .catch(err => {
             console.log(err);
-            res.send(err);
+            console.log(err);
         })
     await User.findByIdAndUpdate(
         req.user._id,
@@ -41,7 +41,7 @@ router.post('/classCreate', async (req, res) => {
                     className:className,
                     profName:req.user.userName
                 }}}
-    )
+        )
         .then(result => {
             const classInput = {
                 classCode:classCode,
@@ -52,7 +52,7 @@ router.post('/classCreate', async (req, res) => {
         })
         .catch(err => {
             console.log(err);
-            res.send(err);
+            console.log(err);
         })
 });
 
@@ -65,7 +65,7 @@ router.delete('/:classCode/delete', async(req, res) => {
         }}}
     )
     .catch(err => {
-        res.send(err);
+        console.log(err);
     })
 
     await Class.findOne({classCode: classCode})
@@ -75,41 +75,129 @@ router.delete('/:classCode/delete', async(req, res) => {
         }
     })
     .catch(err => {
-        res.send(err);
+        console.log(err);
     })
     await Question.deleteMany({classCode: classCode})
         .then(List => {
 
         })
         .catch(err=> {
-            res.send(err);
+            console.log(err);
         })
     await Survey.deleteMany({classCode: classCode})
         .then(List => {
 
         })
         .catch(err=> {
-            res.send(err);
+            console.log(err);
         })
     await Answer_S.deleteMany({classCode: classCode})
+        .then(List => {
+        })
+        .catch(err=> {
+            console.log(err);
+        })
+    await Quiz.deleteMany({classCode: classCode})
+        .then(List => {
+        })
+        .catch(err=> {
+            console.log(err);
+        })
+    await Answer_Q.deleteMany({classCode: classCode})
+        .then(List => {
+        })
+        .catch(err=> {
+            console.log(err);
+        })
+    await BlackList.deleteMany({classCode: classCode})
         .then(List => {
             res.send(true);
         })
         .catch(err=> {
-            res.send(err);
+            console.log(err);
         })
 });
 
+router.get('/:classCode/class',(req,res)=>{
+    const {classCode} = req.params;
+
+    Class.findOne({classCode:classCode})
+        .then((Class)=>{
+        res.send(Class)
+    })
+        .catch(err =>{ console.log(err)});
+})
+
+router.put('/:classCode/alarm',(req,res)=>{
+    const {classCode} = req.params;
+    const {alarm} = req.body
+    console.log(alarm)
+    Class.updateOne({classCode:classCode}, { alarm : !alarm })
+        .then((result) => {
+            res.send(!alarm);
+        })
+        .catch(err => {
+            console.log(err);
+        })
+})
+router.put('/:classCode/classEdit',(req,res)=>{
+    const {classCode} = req.params;
+    const {className} = req.body
+
+    Class.updateOne({ classCode: classCode }, { className : className })
+        .then((result) => {
+            res.send(result.className);
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    User.updateMany({'classList.classCode':classCode},
+        {$set:{
+            "classList.$.className":className
+            }}).then(result=>{console.log(result)})
+        .catch(err=>{console.log(err)});
+})
+
+router.post('/:classCode/home',(req,res)=>{
+    const {classCode} = req.params;
+    const {userID}=req.body;
+    let newQuestion=[];
+    let moment = require("moment");
+    moment.locale("ko");
+    let now=moment().format("LLL");
+
+    Question.find({classCode:classCode})
+        .then(List => {
+            if(List.length>0) {
+                let n=0;
+
+                for(let i=0;i<now.length;i++){
+                    if(now[i]=='오'){
+                        n=i;
+                        break;
+                    }
+                }
+                console.log(now.substring(0,n))
+                for(let i=0;i<List.length;i++){
+                    if(now.substring(0,n)==List[i].date.substring(0,n)
+                        &&List[i].userID!=userID&&newQuestion.length<3) {
+                        newQuestion.push(List[i].question)
+                    }
+                }
+            }
+            res.send(newQuestion)
+        })
+})
+
 router.post('/:classCode/question',(req,res)=>{
     let {classCode}=req.params;
-    Question.find({classCode: classCode})
+    Question.find({classCode:classCode})
         .then(List => {
-            res.send({questionList: List});
+            res.send({questionList: List})
         })
         .catch(err=> {
-            res.send(err);
+            console.log(err);
         })
-
 });
 
 router.post('/:classCode/surveyAdd', (req,res)=>{
@@ -117,9 +205,9 @@ router.post('/:classCode/surveyAdd', (req,res)=>{
     const newSurvey=new Survey(survey);
     newSurvey.save()
     .then(result => {
-        res.send(true);
+        res.send(result);
     })
-    .catch(err =>{ res.send(err)});
+    .catch(err =>{ console.log(err)});
 });
 
 router.post('/:classCode/survey',(req,res)=>{
@@ -133,6 +221,22 @@ router.post('/:classCode/survey',(req,res)=>{
     })
 });
 
+router.post('/:classCode/surveyEdit',(req,res)=>{
+    let {SID, surveyName, surveyList, date}=req.body
+    Survey.updateOne({SID:SID}, {surveyName : surveyName, surveyList:surveyList, date:date})
+    .then(result => {
+        Answer_S.deleteMany({SID: SID})
+        .then(List => {
+            res.send(req.body)
+        })
+        .catch(err=> {
+            console.log(err);
+        })
+    })
+    .catch(err=> {
+        console.log(err);
+    })
+});
 router.put('/:classCode/survey/active',(req,res)=>{
     const {SID, active} = req.body;
     Survey.updateOne({ SID: SID }, { active: !active })
@@ -149,9 +253,9 @@ router.post('/:classCode/quizAdd', (req,res)=>{
     const newQuiz=new Quiz(quiz);
     newQuiz.save()
         .then(result => {
-            res.send(true);
+            res.send(result);
         })
-        .catch(err =>{ res.send(err)});
+        .catch(err =>{ console.log(err)});
 });
 
 router.post('/:classCode/quiz',(req,res)=>{
@@ -164,16 +268,147 @@ router.post('/:classCode/quiz',(req,res)=>{
             console.log(err)
         })
 });
+router.post('/:classCode/quizEdit',(req,res)=>{
+    let {QID, quizName, quizList, date}=req.body
+    Quiz.updateOne({QID:QID}, {quizName:quizName, quizList:quizList, date:date})
+    .then(result => {
+        Answer_Q.deleteMany({QID: QID})
+        .then(List => {
+            res.send(req.body)
+        })
+        .catch(err=> {
+            console.log(err);
+        })
+    })
+    .catch(err=> {
+        console.log(err);
+    })
+});
 
-router.put('/:classCode/quiz/active',(req,res)=>{
-    const {QID, active} = req.body;
-    Quiz.updateOne({ QID: QID }, { active: !active })
-        .then((result) => {
-            res.send(!active);
+router.post('/:classCode/statistics',(req,res)=>{
+    let {classCode} = req.params;
+
+    let avg=0
+    let max=0;
+    let mid=0;
+    let top5=0;
+    let data={}
+
+    Question.aggregate([
+        {'$match':{'classCode': classCode}},
+        {'$group' :
+                {
+                    '_id' : '$studentID',
+                    'count' :{'$sum':1}
+                }
+        },
+        {'$sort':{'count':-1}},
+    ])
+        .then(List => {
+            if(List.length>0){
+                let professor=-1
+                let student=List.length
+                let top=0
+                max=List[0].count;
+                mid=List[parseInt(List.length/2)].count;
+                for(let i=0;i<List.length;i++){
+                    if(List[i]._id=='9999'){
+                        professor=i
+                    }
+                    else {
+                        if(i<5){
+                            top5=(top5*top+List[i].count)/(top+1)
+                            top++;
+                        }
+                        if(i==5&&professor>0){
+                            top5=(top5*top+List[i].count)/(top+1)
+                            top++;
+                        }
+                        avg=avg+List[i].count
+                    }
+                }
+                if(professor!=-1){
+                    List.splice(professor,1)
+                    --student;
+                }
+                avg=avg/student;
+                data={top5:top5.toFixed(1),avg:avg.toFixed(1),max:max,mid:mid};
+                res.send({List:List,data:data});
+            }
+        })
+        .catch(err=> {
+            console.log(err);
+        })
+})
+
+router.post('/:classCode/statistics/quiz', async(req,res)=>{
+    let { classCode } = req.params;
+    let { QID } = req.body;
+    let avg = 0;
+    let max = 0;
+    let mid = 0;
+    let min = 0;
+    let top5 = 0;
+    let data = {};
+    let correctRate=[];
+    let point=[];
+    await Quiz.findOne({QID:QID})
+        .then(List=>{
+            if(List) {
+                for (let i = 0; i < List.quizList.length; i++) {
+                    correctRate.push(List.quizList[i].correctNumber);
+                    point.push(List.quizList[i].point);
+                }
+            }
+        })
+    await Answer_Q.aggregate([
+        { $match: { QID: QID } },
+        {
+            $group: {
+                _id: "$studentID",
+                count: { $sum: "$score" }
+            }
+        },
+        { $sort: { count: -1 } }
+    ])
+        .then(List => {
+            if (List.length > 0) {
+                let student = List.length;
+                let top = 0;
+                max = List[0].count;
+                for(let i=0;i<correctRate.length;i++){
+                    correctRate[i]=parseInt(correctRate[i]/student*100);
+                }
+                if (parseInt(List.length / 2) > 1) {
+                    min = List[parseInt(List.length / 2) - 1].count;
+                }
+                mid = List[parseInt(List.length / 2)].count;
+                for (let i = 0; i < List.length; i++) {
+                    if (i < 5) {
+                        top5 = top5 + List[i].count;
+                        top++;
+                    }
+                    avg = avg + List[i].count;
+                }
+                avg = avg / student;
+                top5 = top5 / top;
+                data = {
+                    top5: top5.toFixed(1),
+                    avg: avg.toFixed(1),
+                    max: max,
+                    min: min,
+                    mid: mid,
+                };
+                console.log(List)
+                console.log(point)
+                console.log(data);
+                console.log(correctRate);
+                res.send({List:List,point:point, correctRate: correctRate,data: data });
+            }
         })
         .catch(err => {
             console.log(err);
-        })
-});
+        });
+})
 
 module.exports = router;

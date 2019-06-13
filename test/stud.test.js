@@ -48,6 +48,7 @@ describe('# Student test', () => {
         //         userID:'testS@email.com',
         //         SID:'27',
         //         answer:['4', '34',"작은대왕"],
+        //         studentID:'201900000',
         //         surveyType: [1, 2, 3],
         //         classCode: 'prtvne'
         //     };
@@ -65,7 +66,7 @@ describe('# Student test', () => {
                 .type('form')
                 .end((err, res) => {
                     expect(err).to.be.null;
-                    expect(res.body).to.equal(true);
+                    expect(res.body).to.be.an("Object");
                     done();
                 });
         });

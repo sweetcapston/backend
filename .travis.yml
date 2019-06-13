@@ -9,9 +9,3 @@ script:
   - npm test
 
 cache: npm
-branches:
-  only:
-    - master
-    - develop
- notifications:
-   slack: ajousweet:rxTiNutNKvONZpgRoDBkFVdY
