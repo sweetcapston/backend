@@ -57,6 +57,8 @@ questionIO.on('connect', (socket) => {
     socket.on("black", async(data) => {
         const blacklist = data.BlackList
         const {classCode, QesID} = data
+        console.log(blacklist);
+        console.log('here')
         
         await Question.findOne({QesID : QesID })
         .then(result => {

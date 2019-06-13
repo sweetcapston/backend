@@ -4,32 +4,37 @@ const router = express.Router();
 // Load User model
 const {BlackList,Class}=require('../models');
 
-router.get('/admin',(req,res)=>{
+router.get('/',(req,res)=>{
     BlackList.find()
-        .then((BlackList)=>{
-            res.send(BlackList)
+        .then((blackList)=>{
+            res.send({blackList:blackList})
         })
         .catch(err =>{ console.log(err)});
 })
 
-router.get('/admin/userBlock', async (req,res)=>{
-    const {classCode,userID} = req.body;
+router.post('/userBlock', async(req,res)=>{
+    const {userID} = req.body.userID;
     await BlackList.updateOne({'BlackList.userID': userID},
         {
+            
             $set: {
-                "BlackList.$.state": true
+                'BlackList.$.state': true
             }
-        }).then()
-    await Class.updateOne({'BlackList.userID': userID},
+        }).then(res=>{console.log('success')});
+        await Class.updateOne({'BlackList.userID': userID},
         {
             $set: {
-                "BlackList.$.state": true
+                'BlackList.$.state': true
             }
         })
+        console.log(req.body.userID);
 })
 
-router.get('/admin/userRelease', async (req,res)=>{
-    const userID = req.body;
+router.post('/userRelease', async (req,res)=>{
+    
+    const {userID, classCode} = req.body;
+    console.log(userID);
+    console.log(classCode);
     await BlackList.updateOne({classCode:classCode,'BlackList.userID': userID},
         {
             $set: {
@@ -43,6 +48,30 @@ router.get('/admin/userRelease', async (req,res)=>{
             }
         }).then(result=>res.send(true))
         .catch(err=>console.log(err));
+})
+
+router.post('/userDelete', async (req,res)=>{
+    const {userID, classCode} = req.body;
+
+    await Class.findAndUpdate(
+        {classCode:classCode},
+        {$pull: { "BlackList": {
+                    userID: userID
+                }}}
+    ).catch(err=> {
+            console.log(err);
+        })
+    await BlackList.findAndUpdate(
+        {classCode:classCode},
+        {$pull: { "BlackList": {
+                    userID: userID
+                }}}
+    ).then(result => {
+        res.send(true)
+    })
+        .catch(err=> {
+            console.log(err);
+        })
 })
 
 

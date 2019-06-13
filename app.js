@@ -78,6 +78,7 @@ app.use('/', require('./routes/index.js'));
 app.use('/users', require('./routes/users.js'));
 app.use('/prof', require('./routes/professor.js'));
 app.use('/stud', require('./routes/student.js'));
+app.use('/admin', require('./routes/admin.js'));
 const PORT = process.env.PORT || 5000;
 /*
 서버에서 활성화
