@@ -13,21 +13,20 @@ router.get('/',(req,res)=>{
 })
 
 router.post('/userBlock', async(req,res)=>{
-    const {userID} = req.body.userID;
-    await BlackList.updateOne({'BlackList.userID': userID},
+    const {userID,classCode} = req.body;
+    console.log(userID);
+    await BlackList.updateOne({classCode:classCode,'BlackList.userID': userID},
         {
-            
             $set: {
                 'BlackList.$.state': true
             }
-        }).then(res=>{console.log('success')});
+        }).then(res=>{console.log(res)});
         await Class.updateOne({'BlackList.userID': userID},
         {
             $set: {
                 'BlackList.$.state': true
             }
         })
-        console.log(req.body.userID);
 })
 
 router.post('/userRelease', async (req,res)=>{
@@ -53,7 +52,7 @@ router.post('/userRelease', async (req,res)=>{
 router.post('/userDelete', async (req,res)=>{
     const {userID, classCode} = req.body;
 
-    await Class.findAndUpdate(
+    await Class.updateOne(
         {classCode:classCode},
         {$pull: { "BlackList": {
                     userID: userID
@@ -61,7 +60,7 @@ router.post('/userDelete', async (req,res)=>{
     ).catch(err=> {
             console.log(err);
         })
-    await BlackList.findAndUpdate(
+    await BlackList.updateOne(
         {classCode:classCode},
         {$pull: { "BlackList": {
                     userID: userID
