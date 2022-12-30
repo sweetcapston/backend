@@ -21,7 +21,7 @@
     "express-ejs-layouts": "^2.5.0",
     "express-session": "^1.15.6",
     "https": "^1.0.0",
-    "mocha": "^6.1.4",
+    "mocha": "^10.2.0",
     "moment": "^2.24.0",
     "mongodb": "^3.2.2",
     "mongoose": "^5.4.1",
